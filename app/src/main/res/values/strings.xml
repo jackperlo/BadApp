@@ -23,4 +23,9 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="account">Account</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="sign_in_to_continue">Sign In to continue</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="new_user">New User?</string>
+    <string name="sign_up">Sign Up</string>
 </resources>
