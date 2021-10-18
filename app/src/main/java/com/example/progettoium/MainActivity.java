@@ -1,7 +1,6 @@
 package com.example.progettoium;
 
 import android.os.Bundle;
-import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 

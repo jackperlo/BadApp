@@ -9,7 +9,7 @@ import android.util.Patterns;
 import com.example.progettoium.ui.login.data.LoginRepository;
 import com.example.progettoium.ui.login.data.Result;
 import com.example.progettoium.ui.login.data.model.LoggedInUser;
-import com.example.progettoium.ui.login.R;
+import com.example.progettoium.R;
 
 public class LoginViewModel extends ViewModel {
 

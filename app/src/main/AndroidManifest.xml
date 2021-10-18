@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProgettoIUM">
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".ui.login.ui.login.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login" />
         <activity

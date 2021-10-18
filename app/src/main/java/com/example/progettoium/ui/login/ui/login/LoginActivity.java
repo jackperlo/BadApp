@@ -22,10 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.progettoium.ui.login.R;
-import com.example.progettoium.ui.login.ui.login.LoginViewModel;
-import com.example.progettoium.ui.login.ui.login.LoginViewModelFactory;
-import com.example.progettoium.ui.login.databinding.ActivityLoginBinding;
+import com.example.progettoium.R;
+import com.example.progettoium.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
