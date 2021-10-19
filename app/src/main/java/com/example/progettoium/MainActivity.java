@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
-        mainActivityBinding.appBarMain.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show());
         DrawerLayout drawer = mainActivityBinding.drawerLayout;
         NavigationView navigationView = mainActivityBinding.navView;
         // Passing each menu ID as a set of Ids because each
