@@ -5,9 +5,6 @@ import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
