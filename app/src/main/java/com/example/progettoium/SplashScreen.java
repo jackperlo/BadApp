@@ -18,7 +18,7 @@ public class SplashScreen extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         setContentView(R.layout.activity_splash_screen);
 
-        getWindow().setExitTransition(new Fade());
+        getWindow().setExitTransition(new Fade(Fade.MODE_OUT));
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -28,6 +28,6 @@ public class SplashScreen extends AppCompatActivity {
                 startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(SplashScreen.this).toBundle());
                 finishAfterTransition();
             }
-        }, 500);
+        }, 200);
     }
 }
