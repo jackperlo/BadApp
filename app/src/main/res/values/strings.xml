@@ -7,12 +7,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    /*Menu Drawer*/
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_account">Account</string>
 
-    /*Our custom Strings*/
-    <string name="download_data_for_the_first_time">Download Data for the first Time</string>
+    /*Login Fragment*/
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -22,10 +21,18 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="account">Account</string>
     <string name="sign_in">SIGN IN</string>
     <string name="sign_in_to_continue">Sign In to continue</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="new_user">New User?</string>
     <string name="sign_up">Sign Up</string>
+
+    /*Home Fragment*/
+    <string name="welcome_user">Hi, Guest</string>
+    <string name="download_data_for_the_first_time">Download Data for the first Time</string>
+    <string name="monday">MON</string>
+    <string name="tuesday">TUE</string>
+    <string name="wednesday">WED</string>
+    <string name="thursday">THU</string>
+    <string name="friday">FRI</string>
 </resources>

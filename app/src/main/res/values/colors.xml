@@ -7,6 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="LIGHT_BLUE">#1DA1F2</color>
-    <color name="Testo">#DD616060</color>
+
+    <!--custom PALETTE colors-->
+    <color name="MAIN_COLOR">#1DA1F2</color>
+    <color name="MAIN_COLOR_COMPLEMENTAR_1">#1489a9</color>
+    <color name="MAIN_COLOR_COMPLEMENTAR_2">#8fe7ff</color>
+    <color name="MAIN_COLOR_FADED">#c7f3ff</color>
+    <color name="MAIN_BACKGROUND">#f3f3f3</color>
+    <color name="TEXT">#DD616060</color>
 </resources>
