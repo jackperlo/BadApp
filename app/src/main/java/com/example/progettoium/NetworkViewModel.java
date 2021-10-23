@@ -3,6 +3,8 @@ package com.example.progettoium;
 import android.app.Application;
 import android.util.Log;
 
+import com.example.progettoium.model.Users;
+
 import androidx.lifecycle.AndroidViewModel;
 
 import org.json.JSONArray;
@@ -44,8 +46,8 @@ public class NetworkViewModel extends AndroidViewModel {
                 JSONObject jsonObject = new JSONObject(val);
                 JSONArray results = jsonObject.getJSONArray("results");
                 JSONObject name = results.getJSONObject(0).getJSONObject("name");
-                User myUser = new User(name.get("first").toString(), name.get("last").toString(), results.getJSONObject(0).get("email").toString());
-                data.update(myUser); // aggiorna i live data
+                Users myUsers = new Users(1, name.get("first").toString(), name.get("last").toString(), results.getJSONObject(0).get("email").toString());
+                data.update(myUsers); // aggiorna i live data
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
