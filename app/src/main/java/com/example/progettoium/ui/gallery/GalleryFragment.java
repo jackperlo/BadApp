@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentGalleryBinding;
-import com.example.progettoium.ui.login.ui.login.LoginActivity;
 
 public class GalleryFragment extends Fragment {
 
@@ -29,14 +28,6 @@ public class GalleryFragment extends Fragment {
 
         binding = FragmentGalleryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        binding.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), LoginActivity.class);
-                getActivity().startActivity(intent);
-            }
-        });
 
         final TextView textView = binding.textGallery;
         galleryViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
