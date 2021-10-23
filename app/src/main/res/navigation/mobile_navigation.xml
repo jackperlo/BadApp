@@ -14,12 +14,17 @@
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.example.progettoium.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
+        android:label="@string/menu_login"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/nav_slideshow"
         android:name="com.example.progettoium.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
+        android:label="slideshow"
         tools:layout="@layout/fragment_slideshow" />
+    <activity
+        android:id="@+id/nav_login"
+        android:name="com.example.progettoium.ui.login.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
 </navigation>

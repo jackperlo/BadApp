@@ -46,8 +46,7 @@ public class HomeFragment extends Fragment {
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getData().observe(getViewLifecycleOwner(), ite -> {
-            Toast toast = Toast.makeText(getContext(), ite.getName() + " " + ite.getSurname(), Toast.LENGTH_SHORT);
-            toast.show();
+            binding.lblWelcomeMainFragment.setText("Hi, "+ite.getAccount() + " " +ite.getPassword());
         });
     }
 

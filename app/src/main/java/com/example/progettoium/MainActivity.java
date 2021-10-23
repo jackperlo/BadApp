@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -36,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
             TextView txtNome = findViewById(R.id.txtNameSurname);
             TextView txtMail = findViewById(R.id.txtMail);
 
-            txtNome.setText(ite.getName() + " " + ite.getSurname());
-            txtMail.setText(ite.getEmail());
+            txtNome.setText(ite.getAccount() + " " + ite.getPassword());
+            txtMail.setText(ite.getRole());
         });
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
