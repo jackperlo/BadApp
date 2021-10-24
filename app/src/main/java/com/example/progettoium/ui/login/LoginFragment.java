@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +40,8 @@ public class LoginFragment extends Fragment {
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment fr = new RegisterFragment();
-                FragmentManager fm = getChildFragmentManager();
-                FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                fragmentTransaction.replace(R.id.nav_login, fr);
-                fragmentTransaction.commit();
+                NavHostFragment.findNavController(LoginFragment.this)
+                        .navigate(R.id.action_nav_login_to_nav_register);
             }
         });
 
