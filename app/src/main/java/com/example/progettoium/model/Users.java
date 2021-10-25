@@ -1,31 +1,19 @@
 package com.example.progettoium.model;
 
 public class Users {
-    int codUser;
-    String account;
-    String password;
-    String role;
+    String name;
+    String email;
 
-    public Users(int codUser, String account, String password, String role) {
-        this.codUser = codUser;
-        this.account = account;
-        this.password = password;
-        this.role = role;
+    public Users(String name, String email) {
+        this.name = name;
+        this.email = email;
     }
 
-    public int getCodUser() {
-        return codUser;
+    public String getName() {
+        return name;
     }
 
-    public String getAccount() {
-        return account;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getRole() {
-        return role;
+    public String getEmail() {
+        return email;
     }
 }

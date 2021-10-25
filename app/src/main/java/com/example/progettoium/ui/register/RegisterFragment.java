@@ -9,12 +9,19 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.progettoium.NetworkViewModel;
+import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentRegisterBinding;
+import com.example.progettoium.ui.login.LoginFragment;
 
 public class RegisterFragment extends Fragment {
 
+    private NetworkViewModel networkViewModel;
     private FragmentRegisterBinding binding;
 
     @Override
@@ -25,6 +32,8 @@ public class RegisterFragment extends Fragment {
         binding = FragmentRegisterBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
+
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -32,6 +41,10 @@ public class RegisterFragment extends Fragment {
                     String password = binding.password.getText().toString();
                     if(valideteRetypePassword(binding.retypePassword, password)) {
                         binding.loading.setVisibility(View.VISIBLE);
+                        networkViewModel.registerUser(binding.name.getText().toString(), binding.email.getText().toString(), password);
+
+                        NavHostFragment.findNavController(RegisterFragment.this)
+                                .navigate(R.id.action_nav_register_to_nav_home);
                     }
                 }
             }
@@ -70,15 +83,15 @@ public class RegisterFragment extends Fragment {
     private boolean validatePassword(EditText password) {
         String val = password.getText().toString();
         String passwordVal =
-                "(?=.*[@#$%^&+=])";  //at least 1 special character//no white spaces
+                "(.*[0-9])";  //at least 1 numeric
 
         if (val.isEmpty()) {
             password.setError("Field cannot be empty");
             return false;
-        } /*else if (!val.matches(passwordVal)) {
-            password.setError("Password is too weak");
+        } else if (!val.matches(passwordVal)) {
+            password.setError("Password must contain at least 1 numeric character");
             return false;
-        }*/ else {
+        } else {
             password.setError(null);
             return true;
         }

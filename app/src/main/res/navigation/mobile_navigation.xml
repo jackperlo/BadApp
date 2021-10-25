@@ -25,5 +25,9 @@
         android:id="@+id/nav_register"
         android:name="com.example.progettoium.ui.register.RegisterFragment"
         android:label="Register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_nav_register_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
 </navigation>

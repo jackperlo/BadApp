@@ -31,12 +31,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mainActivityBinding.getRoot());
 
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
-        model.getData().observe(this, ite -> {
+        model.getUserRegistrato().observe(this, ite -> {
             TextView txtNome = findViewById(R.id.txtNameSurname);
             TextView txtMail = findViewById(R.id.txtMail);
 
-            txtNome.setText(ite.getAccount() + " " + ite.getPassword());
-            txtMail.setText(ite.getRole());
+            txtNome.setText(ite.getName());
+            txtMail.setText(ite.getEmail());
         });
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);

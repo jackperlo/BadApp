@@ -29,14 +29,6 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        /*LISTENERS BUTTON HOME_FRAGMENT*/
-        binding.homeFragmentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                networkViewModel.goToURL();
-            }
-        });
-
         return root;
     }
 
@@ -45,8 +37,8 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
-        networkViewModel.getData().observe(getViewLifecycleOwner(), ite -> {
-            binding.lblWelcomeMainFragment.setText("Hi, "+ite.getAccount() + " " +ite.getPassword());
+        networkViewModel.getUserRegistrato().observe(getViewLifecycleOwner(), ite -> {
+            binding.lblWelcomeMainFragment.setText("Hi, "+ite.getName());
         });
     }
 
