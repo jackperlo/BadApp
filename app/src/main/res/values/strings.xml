@@ -25,7 +25,6 @@
     <string name="sign_in_to_continue">Sign In to continue</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="new_user">New User?</string>
-    <string name="sign_up">Sign Up</string>
 
     <!--Home Fragment-->
     <string name="welcome_user">Hi, Guest</string>
@@ -40,4 +39,9 @@
     <string name="book">BOOK</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">Name</string>
+    <string name="re_type_password">Re-type Password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="register">Register</string>
+    <string name="sign_up_to_continue">Sign Up to continue</string>
 </resources>

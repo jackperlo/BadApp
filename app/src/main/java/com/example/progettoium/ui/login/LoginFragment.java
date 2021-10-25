@@ -32,11 +32,6 @@ public class LoginFragment extends Fragment {
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final EditText txtUsername = binding.username;
-        final EditText txtPassword = binding.password;
-        final Button loginButton = binding.login;
-        final ProgressBar progressBar = binding.loading;
-
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
