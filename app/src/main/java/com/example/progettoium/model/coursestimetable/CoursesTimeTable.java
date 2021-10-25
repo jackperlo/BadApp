@@ -1,4 +1,7 @@
-package com.example.progettoium.model;
+package com.example.progettoium.model.coursestimetable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoursesTimeTable {
     String day;
@@ -27,5 +30,20 @@ public class CoursesTimeTable {
 
     public int getCodCourse() {
         return codCourse;
+    }
+
+    public CoursesTimeTable() {
+    }
+
+    public static ArrayList<CoursesTimeTable> createCourses() {
+        ArrayList<CoursesTimeTable> allCourses = new ArrayList<CoursesTimeTable>();
+        for (int i = 0; i < 15; i++){
+            CoursesTimeTable course = new CoursesTimeTable();
+            course.codCourse = i;
+            course.startTime = ""+i;
+            course.endTime = ""+(i+1);
+            allCourses.add(course);
+        }
+        return allCourses;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.progettoium.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +13,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progettoium.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentHomeBinding;
+import com.example.progettoium.model.Courses;
+import com.example.progettoium.model.coursestimetable.CoursesCustomViewAdapter;
+import com.example.progettoium.model.coursestimetable.CoursesTimeTableViewModel;
+import com.example.progettoium.model.coursestimetable.CoursesTimeTableViewModelFactory;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
@@ -37,9 +46,10 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
-        networkViewModel.getUserRegistrato().observe(getViewLifecycleOwner(), ite -> {
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), ite -> {
             binding.lblWelcomeMainFragment.setText("Hi, "+ite.getName());
         });
+
     }
 
     @Override

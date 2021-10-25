@@ -13,7 +13,6 @@ public class Courses {
         return codCourse;
     }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
+
 }

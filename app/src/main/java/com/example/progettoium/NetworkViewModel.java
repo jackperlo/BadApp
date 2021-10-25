@@ -30,12 +30,12 @@ import java.util.concurrent.Executors;
 * View Model di interfaccia con la rete internet
 */
 public class NetworkViewModel extends AndroidViewModel {
-    private final NetworkLiveData userRegistrato;
+    private final NetworkLiveData networdData;
     private static final String serverUrl = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/hello-servlet";
 
     public NetworkViewModel(Application application) {
         super(application);
-        userRegistrato = new NetworkLiveData();
+        networdData = new NetworkLiveData();
     }
 
     public void registerUser(String name, String email, String password) {
@@ -48,7 +48,7 @@ public class NetworkViewModel extends AndroidViewModel {
 
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
                     Users user = new Users(jsonObject.get("name").toString(), jsonObject.get("email").toString());
-                    userRegistrato.updateUser(user); // aggiorna i live data
+                    networdData.updateUser(user); // aggiorna i live data
                 }
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -56,40 +56,10 @@ public class NetworkViewModel extends AndroidViewModel {
         });
     }
 
-    private String sendRequest(String urlServer, String name, String email, String password) {
-        HttpURLConnection conn = null;
-
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("nome", name);
-        jsonObject.addProperty("email", email);
-        jsonObject.addProperty("password", password);
-
-        try {
-            urlServer+="?nome=" + name + "&email=" + email + "&password=" + password;
-            URL url = new URL(urlServer);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
-            conn.setRequestMethod("GET");
-
-            conn.connect();
-            int response = conn.getResponseCode();
-            Log.d("HttpURLConnection", "The response is: " + response);
-            // Converti  InputStream in JSON
-            return readIt(conn.getInputStream());
-        } catch (Exception ex) {
-            Log.e("async", ex.getMessage());
-            return null;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
+    public NetworkLiveData getRegisteredUser() {
+        return networdData;
     }
 
-    public NetworkLiveData getUserRegistrato() {
-        return userRegistrato;
-    }
 
     /*public void goToURL() {
         Executor e = Executors.newSingleThreadExecutor();
@@ -142,5 +112,36 @@ public class NetworkViewModel extends AndroidViewModel {
             result.append(line).append("\n");
         }
         return result.toString();
+    }
+
+    private String sendRequest(String urlServer, String name, String email, String password) {
+        HttpURLConnection conn = null;
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("nome", name);
+        jsonObject.addProperty("email", email);
+        jsonObject.addProperty("password", password);
+
+        try {
+            urlServer+="?nome=" + name + "&email=" + email + "&password=" + password;
+            URL url = new URL(urlServer);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+
+            conn.connect();
+            int response = conn.getResponseCode();
+            Log.d("HttpURLConnection", "The response is: " + response);
+            // Converti  InputStream in JSON
+            return readIt(conn.getInputStream());
+        } catch (Exception ex) {
+            Log.e("async", ex.getMessage());
+            return null;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
     }
 }
