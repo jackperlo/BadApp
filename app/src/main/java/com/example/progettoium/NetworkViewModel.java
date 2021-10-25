@@ -23,6 +23,8 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -30,25 +32,28 @@ import java.util.concurrent.Executors;
 * View Model di interfaccia con la rete internet
 */
 public class NetworkViewModel extends AndroidViewModel {
-    private final NetworkLiveData networdData;
+    private final NetworkLiveData networkData;
     private static final String serverUrl = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/hello-servlet";
 
     public NetworkViewModel(Application application) {
         super(application);
-        networdData = new NetworkLiveData();
+        networkData = new NetworkLiveData();
     }
 
     public void registerUser(String name, String email, String password) {
         Executor e = Executors.newSingleThreadExecutor();
+        // a potentially time consuming task
         e.execute(() -> {
-            // a potentially time consuming task
-            String val = sendRequest(serverUrl, name, email, password);
+            HashMap<String, String> items = new HashMap<String, String>();
+            items.put("name", name);
+            items.put("email", email);
+            items.put("password", password);
+            String val = sendGETRequest(serverUrl, items);
             try {
                 JSONObject jsonObject = new JSONObject(val);
-
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
                     Users user = new Users(jsonObject.get("name").toString(), jsonObject.get("email").toString());
-                    networdData.updateUser(user); // aggiorna i live data
+                    networkData.updateUser(user); // aggiorna i live data
                 }
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -57,7 +62,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public NetworkLiveData getRegisteredUser() {
-        return networdData;
+        return networkData;
     }
 
 
@@ -104,8 +109,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }*/
 
     private String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(stream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         String line;
         StringBuilder result = new StringBuilder();
         while ((line = reader.readLine()) != null) {
@@ -114,16 +118,22 @@ public class NetworkViewModel extends AndroidViewModel {
         return result.toString();
     }
 
-    private String sendRequest(String urlServer, String name, String email, String password) {
+    private String sendGETRequest(String urlServer, HashMap<String, String> params) {
         HttpURLConnection conn = null;
 
+        urlServer += "?";
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("nome", name);
-        jsonObject.addProperty("email", email);
-        jsonObject.addProperty("password", password);
+        int i = 0;
+        for(String itemKey : params.keySet()){
+            jsonObject.addProperty(itemKey, params.get(itemKey));
+            if(i == 0)
+                urlServer += itemKey + "=" + params.get(itemKey);
+            else
+                urlServer+= "&" + itemKey + "=" +params.get(itemKey);
+            i++;
+        }
 
         try {
-            urlServer+="?nome=" + name + "&email=" + email + "&password=" + password;
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
@@ -143,5 +153,7 @@ public class NetworkViewModel extends AndroidViewModel {
                 conn.disconnect();
             }
         }
+
     }
+    
 }
