@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
@@ -138,7 +139,15 @@ public class NetworkViewModel extends AndroidViewModel {
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Accept-Charset", "utf-8");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+            conn.setDoOutput(true);
+
+            String data = jsonObject.toString();
+            try(OutputStream os = conn.getOutputStream()){
+                os.write(data.getBytes(StandardCharsets.UTF_8));
+            }
 
             conn.connect();
             int response = conn.getResponseCode();
