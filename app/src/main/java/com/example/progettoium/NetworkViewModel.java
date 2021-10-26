@@ -1,32 +1,36 @@
 package com.example.progettoium;
 
 import android.app.Application;
+import android.telecom.Call;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.progettoium.model.Users;
+import com.example.progettoium.ui.register.RegisterFragment;
 import com.google.gson.JsonObject;
 
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.navigation.fragment.NavHostFragment;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /*
@@ -34,36 +38,83 @@ import java.util.concurrent.Executors;
 */
 public class NetworkViewModel extends AndroidViewModel {
     private final NetworkLiveData networkData;
-    private static final String serverUrl = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/hello-servlet";
+    private static final String serverUrlRegistration = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-registration";
+    private static final String serverUrlLogin = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-login";
+
 
     public NetworkViewModel(Application application) {
         super(application);
         networkData = new NetworkLiveData();
     }
 
-    public void registerUser(String name, String email, String password) {
-        Executor e = Executors.newSingleThreadExecutor();
-        // a potentially time consuming task
-        e.execute(() -> {
+    public boolean[] registerUser(String name, String email, String password) {
+        final boolean[] correctRegistration = {false};
+        ExecutorService es = Executors.newSingleThreadExecutor();
+
+        List<Callable<Object>> todo = new ArrayList<>();
+        todo.add(Executors.callable(() -> {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("name", name);
             items.put("email", email);
             items.put("password", password);
-            String val = sendGETRequest(serverUrl, items);
+            String val = sendPOSTRequest(serverUrlRegistration, items);
             try {
                 JSONObject jsonObject = new JSONObject(val);
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
                     Users user = new Users(jsonObject.get("name").toString(), jsonObject.get("email").toString());
                     networkData.updateUser(user); // aggiorna i live data
+                    correctRegistration[0] = true;
                 }
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        });
+        }));
+
+        try {
+            es.invokeAll(todo);
+            // istruzioni fatte dopo il richiamo
+            return correctRegistration;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+
+            return correctRegistration;
+        }
     }
 
     public NetworkLiveData getRegisteredUser() {
         return networkData;
+    }
+
+    public boolean[] loginUser(String email, String password) {
+        final boolean[] correctLogin = {false};
+        ExecutorService es = Executors.newSingleThreadExecutor();
+
+        List<Callable<Object>> todo = new ArrayList<>();
+        todo.add(Executors.callable(() -> {
+            HashMap<String, String> items = new HashMap<String, String>();
+            items.put("email", email);
+            items.put("password", password);
+            String val = sendPOSTRequest(serverUrlLogin, items);
+            try {
+                JSONObject jsonObject = new JSONObject(val);
+                if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
+                    networkData.updateUser(new Users(jsonObject.get("name").toString(), email));
+                    correctLogin[0] = true;
+                }
+            } catch (JSONException jsonException) {
+                jsonException.printStackTrace();
+            }
+        }));
+
+        try {
+            es.invokeAll(todo);
+            // istruzioni fatte dopo il richiamo
+            return correctLogin;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+
+            return correctLogin;
+        }
     }
 
 
@@ -119,7 +170,7 @@ public class NetworkViewModel extends AndroidViewModel {
         return result.toString();
     }
 
-    private String sendGETRequest(String urlServer, HashMap<String, String> params) {
+    private String sendPOSTRequest(String urlServer, HashMap<String, String> params) {
         HttpURLConnection conn = null;
 
         urlServer += "?";

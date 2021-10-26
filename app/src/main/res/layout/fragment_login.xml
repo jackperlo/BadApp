@@ -67,24 +67,6 @@
         app:layout_constraintTop_toBottomOf="@+id/email"
         tools:ignore="TextContrastCheck" />
 
-    <Button
-        android:id="@+id/signup"
-        android:layout_width="251dp"
-        android:layout_height="64dp"
-        android:layout_gravity="start"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="64dp"
-        android:backgroundTint="@color/white"
-        android:enabled="false"
-        android:text="@string/sign_in"
-        android:textColor="@color/MAIN_COLOR"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.437" />
-
     <ProgressBar
         android:id="@+id/loading"
         android:layout_width="wrap_content"
@@ -133,27 +115,40 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="104dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="47dp"
         android:text="@string/new_user"
         android:textColor="@color/TEXT"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup"
+        app:layout_constraintTop_toBottomOf="@+id/signIn"
         tools:ignore="TextContrastCheck" />
 
     <TextView
         android:id="@+id/btnRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_width="80dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="44dp"
         android:clickable="true"
         android:text="@string/sign_up"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.131"
+        app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toEndOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/signup"
+        app:layout_constraintTop_toBottomOf="@+id/signIn"
         tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
+
+    <Button
+        android:id="@+id/signIn"
+        android:layout_width="203dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="60dp"
+        android:backgroundTint="@color/MAIN_COLOR_COMPLEMENTAR_2"
+        android:text="Sign In"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

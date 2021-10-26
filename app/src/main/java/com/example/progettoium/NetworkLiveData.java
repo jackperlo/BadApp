@@ -11,7 +11,6 @@ import androidx.lifecycle.LiveData;
 * da cahce nell'interfacciamento con le risorse richieste in rete.*/
 public class NetworkLiveData extends LiveData<Users> {
     public void updateUser(Users result) {
-        Log.d("LIVEDATA", "updating");
         postValue(result); // Notifica tutti i listener
     }
 }

@@ -17,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.progettoium.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentRegisterBinding;
+import com.example.progettoium.model.Users;
 import com.example.progettoium.ui.login.LoginFragment;
 
 public class RegisterFragment extends Fragment {
@@ -41,10 +42,13 @@ public class RegisterFragment extends Fragment {
                     String password = binding.password.getText().toString();
                     if(valideteRetypePassword(binding.retypePassword, password)) {
                         binding.loading.setVisibility(View.VISIBLE);
-                        networkViewModel.registerUser(binding.name.getText().toString(), binding.email.getText().toString(), password);
-
-                        NavHostFragment.findNavController(RegisterFragment.this)
-                                .navigate(R.id.action_nav_register_to_nav_home);
+                        if (networkViewModel.registerUser(binding.name.getText().toString(), binding.email.getText().toString(), password)[0]) {
+                            NavHostFragment.findNavController(RegisterFragment.this)
+                                    .navigate(R.id.action_nav_register_to_nav_home);
+                        } else {
+                            binding.loading.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getContext(), "Registration failed! Try Again!", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             }

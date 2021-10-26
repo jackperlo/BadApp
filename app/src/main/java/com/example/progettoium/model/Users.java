@@ -9,6 +9,9 @@ public class Users {
         this.email = email;
     }
 
+    public Users() {
+    }
+
     public String getName() {
         return name;
     }
