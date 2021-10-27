@@ -1,8 +1,6 @@
 package com.example.progettoium;
 
-import android.util.Log;
-
-import com.example.progettoium.model.Users;
+import com.example.progettoium.data.Users;
 
 import androidx.lifecycle.LiveData;
 

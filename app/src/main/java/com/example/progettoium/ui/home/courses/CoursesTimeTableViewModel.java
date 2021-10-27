@@ -1,6 +1,8 @@
-package com.example.progettoium.model.coursestimetable;
+package com.example.progettoium.ui.home.courses;
 
 import android.content.Context;
+
+import com.example.progettoium.data.CoursesTimeTable;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

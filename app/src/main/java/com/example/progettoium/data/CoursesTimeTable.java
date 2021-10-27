@@ -1,7 +1,6 @@
-package com.example.progettoium.model.coursestimetable;
+package com.example.progettoium.data;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CoursesTimeTable {
     String day;

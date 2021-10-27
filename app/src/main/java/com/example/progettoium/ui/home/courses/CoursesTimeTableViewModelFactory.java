@@ -1,4 +1,4 @@
-package com.example.progettoium.model.coursestimetable;
+package com.example.progettoium.ui.home.courses;
 
 import android.content.Context;
 

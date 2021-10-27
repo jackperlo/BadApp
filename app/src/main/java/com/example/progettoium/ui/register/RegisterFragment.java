@@ -1,7 +1,6 @@
 package com.example.progettoium.ui.register;
 
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -17,8 +15,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.progettoium.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentRegisterBinding;
-import com.example.progettoium.model.Users;
-import com.example.progettoium.ui.login.LoginFragment;
 
 public class RegisterFragment extends Fragment {
 

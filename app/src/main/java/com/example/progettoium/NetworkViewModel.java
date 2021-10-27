@@ -1,17 +1,12 @@
 package com.example.progettoium;
 
 import android.app.Application;
-import android.telecom.Call;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.progettoium.model.Users;
-import com.example.progettoium.ui.register.RegisterFragment;
+import com.example.progettoium.data.Users;
 import com.google.gson.JsonObject;
 
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

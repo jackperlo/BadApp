@@ -1,4 +1,4 @@
-package com.example.progettoium.model;
+package com.example.progettoium.data;
 
 public class Teachers {
     int codTeacher;

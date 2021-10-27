@@ -1,13 +1,15 @@
-package com.example.progettoium;
+package com.example.progettoium.ui;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
-import com.example.progettoium.model.coursestimetable.CoursesCustomViewAdapter;
-import com.example.progettoium.model.coursestimetable.CoursesTimeTableViewModel;
-import com.example.progettoium.model.coursestimetable.CoursesTimeTableViewModelFactory;
+import com.example.progettoium.NetworkViewModel;
+import com.example.progettoium.R;
+import com.example.progettoium.ui.home.courses.CoursesCustomViewAdapter;
+import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModel;
+import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModelFactory;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -30,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mainActivityBinding;
 
     private NetworkViewModel model;
-    CoursesCustomViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mainActivityBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mainActivityBinding.getRoot());
 
+        /*it must stay here because is shared between fragments (it's the side menu)*/
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
         model.getRegisteredUser().observe(this, ite -> {
             TextView txtNome = findViewById(R.id.txtNameSurname);
@@ -60,25 +62,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-        //setting up recycler view to show courses
-        CoursesTimeTableViewModelFactory factory = new CoursesTimeTableViewModelFactory(this);
-        CoursesTimeTableViewModel viewModel = new ViewModelProvider(this, factory).get(CoursesTimeTableViewModel.class);
-
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.courses_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new CoursesCustomViewAdapter(this, new ArrayList());
-        recyclerView.setAdapter(adapter);
-        viewModel.fetchCourses();
-
-        viewModel.getCourses().observe(this, userObjects -> {
-            Log.i("Home Fragment", "numero corsi: " + userObjects.size());
-            if (userObjects.size() > 0) {
-                Log.i("Home Fragment", "Corso: " + userObjects.get(0).getCodCourse() + " | Start: " + userObjects.get(0).getStartTime());
-            }
-            adapter.setData(userObjects);  // setta i dati nella recyclerView
-        });
     }
 
     @Override

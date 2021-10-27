@@ -1,11 +1,8 @@
-package com.example.progettoium.model.coursestimetable;
+package com.example.progettoium.ui.home.courses;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.provider.ContactsContract;
 
-import com.example.progettoium.R;
-import com.example.progettoium.model.Courses;
+import com.example.progettoium.data.CoursesTimeTable;
 
 import java.util.ArrayList;
 import java.util.List;

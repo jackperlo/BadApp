@@ -1,4 +1,4 @@
-package com.example.progettoium.model.coursestimetable;
+package com.example.progettoium.ui.home.courses;
 
 
 import android.content.Context;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import com.example.progettoium.R;
+import com.example.progettoium.data.CoursesTimeTable;
 
 public class CoursesCustomViewAdapter extends RecyclerView.Adapter<CoursesCustomViewAdapter.ViewHolder> {
 
