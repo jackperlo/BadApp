@@ -168,7 +168,63 @@ public class NetworkViewModel extends AndroidViewModel {
 
 
 
-    /*public void goToURL() {
+    // TODO: dare un occhio a AsyncHTTPClient come alternativa easy to read agli executor
+    /*
+
+    class Model {
+
+    private static AsyncHttpClient client;
+
+    Model() {
+        client = new AsyncHttpClient();
+    }
+
+    void checkLogin(final Context ctx, final Class classe, String u, String p, RequestParams params) {
+
+        final String username = new String(u);
+        final String password = new String(p);
+
+        client.get(MYURL, params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Toast.makeText(ctx, "Login_success" + username, Toast.LENGTH_SHORT).show();
+                Intent i1 = new Intent(ctx, classe);
+                Intent i2 = new Intent(ctx, AdministratorActivity.class);
+
+                //Controllo se è amministratore
+                Boolean isAdmin = false;
+
+                try {
+                    isAdmin = response.getBoolean("ISADMIN");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(!isAdmin) {
+                    i1.putExtra("username", username);
+                    ctx.startActivity(i1);
+                } else {
+                    i2.putExtra("username", username);
+                    ctx.startActivity(i2);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                //super.onFailure(statusCode, headers, responseString, throwable);
+                Toast.makeText(ctx, "username o password incorretta", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+
+
+
+
+    public void goToURL() {
         Executor e = Executors.newSingleThreadExecutor();
         e.execute(() -> {
             // a potentially time consuming task

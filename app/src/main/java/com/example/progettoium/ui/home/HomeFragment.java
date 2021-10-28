@@ -56,12 +56,12 @@ public class HomeFragment extends Fragment {
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), ite -> {
             binding.lblWelcomeMainFragment.setText("Hi, "+ite.getName());
         });
-        coursesViewModel.getCourses().observe(getViewLifecycleOwner(), userObjects -> {
-            Log.i("Home Fragment", "numero corsi: " + userObjects.size());
-            if (userObjects.size() > 0) {
-                Log.i("Home Fragment", "Corso: " + userObjects.get(0).getCodCourse() + " | Start: " + userObjects.get(0).getStartTime());
+        coursesViewModel.getCourses().observe(getViewLifecycleOwner(), courseObjects -> {
+            Log.i("Home Fragment", "numero corsi: " + courseObjects.size());
+            if (courseObjects.size() > 0) {
+                Log.i("Home Fragment", "Corso: " + courseObjects.get(0).getCodCourse() + " | Start: " + courseObjects.get(0).getStartTime());
             }
-            adapter.setData(userObjects);  // setta i dati nella recyclerView
+            adapter.setData(courseObjects);  // setta i dati nella recyclerView
         });
     }
 
