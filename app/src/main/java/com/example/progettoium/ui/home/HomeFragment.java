@@ -13,8 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.progettoium.NetworkViewModel;
-import com.example.progettoium.R;
+import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
 import com.example.progettoium.ui.home.courses.CoursesCustomViewAdapter;
 import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModel;
@@ -57,12 +56,12 @@ public class HomeFragment extends Fragment {
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), ite -> {
             binding.lblWelcomeMainFragment.setText("Hi, "+ite.getName());
         });
-        coursesViewModel.getCourses().observe(getViewLifecycleOwner(), userObjects -> {
-            Log.i("Home Fragment", "numero corsi: " + userObjects.size());
-            if (userObjects.size() > 0) {
-                Log.i("Home Fragment", "Corso: " + userObjects.get(0).getCodCourse() + " | Start: " + userObjects.get(0).getStartTime());
+        coursesViewModel.getCourses().observe(getViewLifecycleOwner(), courseObjects -> {
+            Log.i("Home Fragment", "numero corsi: " + courseObjects.size());
+            if (courseObjects.size() > 0) {
+                Log.i("Home Fragment", "Corso: " + courseObjects.get(0).getCodCourse() + " | Start: " + courseObjects.get(0).getStartTime());
             }
-            adapter.setData(userObjects);  // setta i dati nella recyclerView
+            adapter.setData(courseObjects);  // setta i dati nella recyclerView
         });
     }
 

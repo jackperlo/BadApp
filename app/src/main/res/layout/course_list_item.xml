@@ -14,7 +14,7 @@
 
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
@@ -75,13 +75,15 @@
 
         <Button
             android:id="@+id/btn_bookLesson"
-            android:layout_width="24dp"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginEnd="3dp"
             android:layout_weight="1"
             android:backgroundTint="#1DA1F2"
             android:text="@string/book"
-            android:theme="@style/myButtonTheme" />
+            android:theme="@style/myButtonTheme"
+            tools:ignore="TextContrastCheck" />
     </LinearLayout>
 
     <View

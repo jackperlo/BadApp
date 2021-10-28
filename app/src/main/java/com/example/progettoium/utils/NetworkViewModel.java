@@ -1,4 +1,4 @@
-package com.example.progettoium;
+package com.example.progettoium.utils;
 
 import android.app.Application;
 import android.util.Log;
@@ -86,7 +86,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("name", name);
             items.put("email", email);
             items.put("password", password);
-            String val = sendPOSTRequest(serverUrlRegistration, items);
+            String val = sendPOSTRequest(myURLs.getServerUrlRegistration(), items);
             try {
                 JSONObject jsonObject = new JSONObject(val);
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
@@ -123,7 +123,7 @@ public class NetworkViewModel extends AndroidViewModel {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("email", email);
             items.put("password", password);
-            String val = sendPOSTRequest(serverUrlLogin, items);
+            String val = sendPOSTRequest(myURLs.getServerUrlLogin(), items);
             try {
                 JSONObject jsonObject = new JSONObject(val);
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
@@ -145,49 +145,6 @@ public class NetworkViewModel extends AndroidViewModel {
             return correctLogin;
         }
     }
-
-
-    /*public void goToURL() {
-        Executor e = Executors.newSingleThreadExecutor();
-        e.execute(() -> {
-            // a potentially time consuming task
-            String val = downloadUrl(exampleURL);
-            try {
-                JSONObject jsonObject = new JSONObject(val);
-                JSONArray results = jsonObject.getJSONArray("results");
-                JSONObject name = results.getJSONObject(0).getJSONObject("name");
-                Users myUsers = new Users(1, name.get("first").toString(), name.get("last").toString(), results.getJSONObject(0).get("email").toString());
-                data.update(myUsers); // aggiorna i live data
-            } catch (JSONException jsonException) {
-                jsonException.printStackTrace();
-            }
-        });
-    }*/
-
-    /*private String downloadUrl(String myurl) {
-        Log.d("DOWNLOAD", "Download done succesfully");
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL(myurl);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds *///);
-            /*conn.setConnectTimeout(15000 /* milliseconds *///);
-            /*conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            int response = conn.getResponseCode();
-            Log.d("HttpURLConnection", "The response is: " + response);
-            // Converti  InputStream in JSON
-            return readIt(conn.getInputStream());
-        } catch (Exception ex) {
-            Log.e("async", ex.getMessage());
-            return null;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }*/
 
     private String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -285,3 +242,103 @@ public class NetworkViewModel extends AndroidViewModel {
     }
     
 }
+
+
+
+    // TODO: dare un occhio a AsyncHTTPClient come alternativa easy to read agli executor
+    /*
+
+    class Model {
+
+    private static AsyncHttpClient client;
+
+    Model() {
+        client = new AsyncHttpClient();
+    }
+
+    void checkLogin(final Context ctx, final Class classe, String u, String p, RequestParams params) {
+
+        final String username = new String(u);
+        final String password = new String(p);
+
+        client.get(MYURL, params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Toast.makeText(ctx, "Login_success" + username, Toast.LENGTH_SHORT).show();
+                Intent i1 = new Intent(ctx, classe);
+                Intent i2 = new Intent(ctx, AdministratorActivity.class);
+
+                //Controllo se è amministratore
+                Boolean isAdmin = false;
+
+                try {
+                    isAdmin = response.getBoolean("ISADMIN");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(!isAdmin) {
+                    i1.putExtra("username", username);
+                    ctx.startActivity(i1);
+                } else {
+                    i2.putExtra("username", username);
+                    ctx.startActivity(i2);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                //super.onFailure(statusCode, headers, responseString, throwable);
+                Toast.makeText(ctx, "username o password incorretta", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+
+
+
+
+    public void goToURL() {
+        Executor e = Executors.newSingleThreadExecutor();
+        e.execute(() -> {
+            // a potentially time consuming task
+            String val = downloadUrl(exampleURL);
+            try {
+                JSONObject jsonObject = new JSONObject(val);
+                JSONArray results = jsonObject.getJSONArray("results");
+                JSONObject name = results.getJSONObject(0).getJSONObject("name");
+                Users myUsers = new Users(1, name.get("first").toString(), name.get("last").toString(), results.getJSONObject(0).get("email").toString());
+                data.update(myUsers); // aggiorna i live data
+            } catch (JSONException jsonException) {
+                jsonException.printStackTrace();
+            }
+        });
+    }*/
+
+    /*private String downloadUrl(String myurl) {
+        Log.d("DOWNLOAD", "Download done succesfully");
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(myurl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds *///);
+/*conn.setConnectTimeout(15000 /* milliseconds *///);
+            /*conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+            int response = conn.getResponseCode();
+            Log.d("HttpURLConnection", "The response is: " + response);
+            // Converti  InputStream in JSON
+            return readIt(conn.getInputStream());
+        } catch (Exception ex) {
+            Log.e("async", ex.getMessage());
+            return null;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }*/
