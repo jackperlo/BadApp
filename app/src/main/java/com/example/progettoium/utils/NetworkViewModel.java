@@ -1,4 +1,4 @@
-package com.example.progettoium;
+package com.example.progettoium.utils;
 
 import android.app.Application;
 import android.util.Log;
@@ -32,9 +32,6 @@ import java.util.concurrent.Executors;
 */
 public class NetworkViewModel extends AndroidViewModel {
     private final NetworkLiveData networkData;
-    private static final String serverUrlRegistration = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-registration";
-    private static final String serverUrlLogin = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-login";
-
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -51,7 +48,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("name", name);
             items.put("email", email);
             items.put("password", password);
-            String val = sendPOSTRequest(serverUrlRegistration, items);
+            String val = sendPOSTRequest(myURLs.getServerUrlRegistration(), items);
             try {
                 JSONObject jsonObject = new JSONObject(val);
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
@@ -88,7 +85,7 @@ public class NetworkViewModel extends AndroidViewModel {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("email", email);
             items.put("password", password);
-            String val = sendPOSTRequest(serverUrlLogin, items);
+            String val = sendPOSTRequest(myURLs.getServerUrlLogin(), items);
             try {
                 JSONObject jsonObject = new JSONObject(val);
                 if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
@@ -110,49 +107,6 @@ public class NetworkViewModel extends AndroidViewModel {
             return correctLogin;
         }
     }
-
-
-    /*public void goToURL() {
-        Executor e = Executors.newSingleThreadExecutor();
-        e.execute(() -> {
-            // a potentially time consuming task
-            String val = downloadUrl(exampleURL);
-            try {
-                JSONObject jsonObject = new JSONObject(val);
-                JSONArray results = jsonObject.getJSONArray("results");
-                JSONObject name = results.getJSONObject(0).getJSONObject("name");
-                Users myUsers = new Users(1, name.get("first").toString(), name.get("last").toString(), results.getJSONObject(0).get("email").toString());
-                data.update(myUsers); // aggiorna i live data
-            } catch (JSONException jsonException) {
-                jsonException.printStackTrace();
-            }
-        });
-    }*/
-
-    /*private String downloadUrl(String myurl) {
-        Log.d("DOWNLOAD", "Download done succesfully");
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL(myurl);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds *///);
-            /*conn.setConnectTimeout(15000 /* milliseconds *///);
-            /*conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            int response = conn.getResponseCode();
-            Log.d("HttpURLConnection", "The response is: " + response);
-            // Converti  InputStream in JSON
-            return readIt(conn.getInputStream());
-        } catch (Exception ex) {
-            Log.e("async", ex.getMessage());
-            return null;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }*/
 
     private String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -211,3 +165,47 @@ public class NetworkViewModel extends AndroidViewModel {
     }
     
 }
+
+
+
+    /*public void goToURL() {
+        Executor e = Executors.newSingleThreadExecutor();
+        e.execute(() -> {
+            // a potentially time consuming task
+            String val = downloadUrl(exampleURL);
+            try {
+                JSONObject jsonObject = new JSONObject(val);
+                JSONArray results = jsonObject.getJSONArray("results");
+                JSONObject name = results.getJSONObject(0).getJSONObject("name");
+                Users myUsers = new Users(1, name.get("first").toString(), name.get("last").toString(), results.getJSONObject(0).get("email").toString());
+                data.update(myUsers); // aggiorna i live data
+            } catch (JSONException jsonException) {
+                jsonException.printStackTrace();
+            }
+        });
+    }*/
+
+    /*private String downloadUrl(String myurl) {
+        Log.d("DOWNLOAD", "Download done succesfully");
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(myurl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds *///);
+/*conn.setConnectTimeout(15000 /* milliseconds *///);
+            /*conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+            int response = conn.getResponseCode();
+            Log.d("HttpURLConnection", "The response is: " + response);
+            // Converti  InputStream in JSON
+            return readIt(conn.getInputStream());
+        } catch (Exception ex) {
+            Log.e("async", ex.getMessage());
+            return null;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }*/

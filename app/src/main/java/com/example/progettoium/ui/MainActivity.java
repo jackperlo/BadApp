@@ -1,15 +1,11 @@
 package com.example.progettoium.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
-import com.example.progettoium.NetworkViewModel;
+import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
-import com.example.progettoium.ui.home.courses.CoursesCustomViewAdapter;
-import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModel;
-import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModelFactory;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -19,12 +15,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progettoium.databinding.ActivityMainBinding;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 

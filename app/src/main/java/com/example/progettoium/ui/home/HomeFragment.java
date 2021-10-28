@@ -13,8 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.progettoium.NetworkViewModel;
-import com.example.progettoium.R;
+import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
 import com.example.progettoium.ui.home.courses.CoursesCustomViewAdapter;
 import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModel;
