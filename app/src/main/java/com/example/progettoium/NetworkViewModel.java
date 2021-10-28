@@ -17,6 +17,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookieStore;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -34,11 +38,42 @@ public class NetworkViewModel extends AndroidViewModel {
     private final NetworkLiveData networkData;
     private static final String serverUrlRegistration = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-registration";
     private static final String serverUrlLogin = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-login";
+    private static final String serverUrlCheckSession = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-check-session";
 
 
     public NetworkViewModel(Application application) {
         super(application);
         networkData = new NetworkLiveData();
+    }
+
+    public boolean[] checkSession() {
+        final boolean[] alreadyLogIn = {false};
+        ExecutorService es = Executors.newSingleThreadExecutor();
+
+        List<Callable<Object>> todo = new ArrayList<>();
+        todo.add(Executors.callable(() -> {
+            String val = sendGETRequest(serverUrlCheckSession, new HashMap<>());
+            try {
+                JSONObject jsonObject = new JSONObject(val);
+                if(Boolean.parseBoolean(jsonObject.get("done").toString())) {
+                    Users user = new Users(jsonObject.get("name").toString(), jsonObject.get("email").toString());
+                    networkData.updateUser(user); // aggiorna i live data
+                    alreadyLogIn[0] = true;
+                }
+            } catch (JSONException jsonException) {
+                jsonException.printStackTrace();
+            }
+        }));
+
+        try {
+            es.invokeAll(todo);
+            // istruzioni fatte dopo il richiamo
+            return alreadyLogIn;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+
+            return alreadyLogIn;
+        }
     }
 
     public boolean[] registerUser(String name, String email, String password) {
@@ -193,6 +228,45 @@ public class NetworkViewModel extends AndroidViewModel {
             try(OutputStream os = conn.getOutputStream()){
                 os.write(data.getBytes(StandardCharsets.UTF_8));
             }
+
+            conn.connect();
+            int response = conn.getResponseCode();
+            Log.d("HttpURLConnection", "The response is: " + response);
+            // Converti  InputStream in JSON
+            return readIt(conn.getInputStream());
+        } catch (Exception ex) {
+            Log.e("async", ex.getMessage());
+            return null;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+    }
+
+    private String sendGETRequest(String urlServer, HashMap<String, String> params) {
+        HttpURLConnection conn = null;
+
+        urlServer += "?";
+        JsonObject jsonObject = new JsonObject();
+        int i = 0;
+        for(String itemKey : params.keySet()){
+            jsonObject.addProperty(itemKey, params.get(itemKey));
+            if(i == 0)
+                urlServer += itemKey + "=" + params.get(itemKey);
+            else
+                urlServer+= "&" + itemKey + "=" +params.get(itemKey);
+            i++;
+        }
+
+        try {
+            URL url = new URL(urlServer);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
 
             conn.connect();
             int response = conn.getResponseCode();

@@ -1,6 +1,9 @@
 package com.example.progettoium.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
@@ -24,7 +27,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progettoium.databinding.ActivityMainBinding;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookieStore;
+import java.net.HttpCookie;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,8 +50,11 @@ public class MainActivity extends AppCompatActivity {
         mainActivityBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mainActivityBinding.getRoot());
 
+        CookieHandler.setDefault(new CookieManager());
+
         /*it must stay here because is shared between fragments (it's the side menu)*/
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
+
         model.getRegisteredUser().observe(this, ite -> {
             TextView txtNome = findViewById(R.id.txtNameSurname);
             TextView txtMail = findViewById(R.id.txtMail);
@@ -49,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
             txtNome.setText(ite.getName());
             txtMail.setText(ite.getEmail());
         });
+
+        model.checkSession();
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
         DrawerLayout drawer = mainActivityBinding.drawerLayout;
@@ -76,5 +91,10 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
