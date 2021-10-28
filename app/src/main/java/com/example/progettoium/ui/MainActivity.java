@@ -20,6 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.progettoium.databinding.ActivityMainBinding;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
