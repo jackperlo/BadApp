@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             txtMail.setText(ite.getEmail());
         });
 
-        model.checkSession();
+        //model.checkSession();
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
         DrawerLayout drawer = mainActivityBinding.drawerLayout;

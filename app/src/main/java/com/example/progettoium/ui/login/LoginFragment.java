@@ -44,7 +44,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(validateEmail(binding.email) && validatePassword(binding.password)) {
-                    if(networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())[0]){
+                    if(networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())){
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_nav_login_to_nav_home);
                     } else {

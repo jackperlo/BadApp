@@ -38,7 +38,7 @@ public class RegisterFragment extends Fragment {
                     String password = binding.password.getText().toString();
                     if(valideteRetypePassword(binding.retypePassword, password)) {
                         binding.loading.setVisibility(View.VISIBLE);
-                        if (networkViewModel.registerUser(binding.name.getText().toString(), binding.email.getText().toString(), password)[0]) {
+                        if (networkViewModel.registerUser(binding.name.getText().toString(), binding.email.getText().toString(), password)) {
                             NavHostFragment.findNavController(RegisterFragment.this)
                                     .navigate(R.id.action_nav_register_to_nav_home);
                         } else {
