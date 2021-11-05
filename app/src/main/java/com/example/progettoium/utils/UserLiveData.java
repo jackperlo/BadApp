@@ -1,14 +1,14 @@
 package com.example.progettoium.utils;
 
-import com.example.progettoium.data.Users;
+import com.example.progettoium.data.User;
 
 import androidx.lifecycle.LiveData;
 
 /*
 * Classe di gestione Live Data. Funge da shared memory tra i vari Fragments/Activity e
 * da cahce nell'interfacciamento con le risorse richieste in rete.*/
-public class NetworkLiveData extends LiveData<Users> {
-    public void updateUser(Users result) {
+public class UserLiveData extends LiveData<User> {
+    public void updateUser(User result) {
         postValue(result); // Notifica tutti i listener
     }
 }

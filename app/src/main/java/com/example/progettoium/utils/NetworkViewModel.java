@@ -3,12 +3,13 @@ package com.example.progettoium.utils;
 import android.app.Application;
 import android.util.Log;
 
-import com.example.progettoium.data.Users;
+import com.example.progettoium.data.BookedRepetitions;
+import com.example.progettoium.data.User;
 import com.google.gson.JsonObject;
 
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,61 +34,33 @@ import java.util.concurrent.atomic.AtomicReference;
 * View Model di interfaccia con la rete internet
 */
 public class NetworkViewModel extends AndroidViewModel{
-    private final NetworkLiveData networkData;
+    private final UserLiveData usersData;
+    private final BookedRepetitionsLiveData bookedRepetitionsData;
 
     public NetworkViewModel(Application application) {
         super(application);
 
-        networkData = new NetworkLiveData();
+        usersData = new UserLiveData();
+        bookedRepetitionsData = new BookedRepetitionsLiveData();
     }
 
-    public NetworkLiveData getRegisteredUser() {
-        return networkData;
-    }
+    /*GETTING DATA FROM LIVE DATA ALREADY FILLED UP FROM DB QUERIES*/
+    public UserLiveData getRegisteredUser() { return usersData; }
 
-    public JSONObject launchThread(String url, HashMap<String, String> params, String type) {
-        AtomicReference<JSONObject> returnJson = new AtomicReference<>();
-        ExecutorService es = Executors.newSingleThreadExecutor();
+    public BookedRepetitionsLiveData getBookedRepetitions(){ return bookedRepetitionsData; }
+    /*END GETTING DATA FROM LIVE DATA*/
 
-        List<Callable<Object>> asyncFunction = new ArrayList<>();
-        asyncFunction.add(Executors.callable(() -> {
-            String val;
-            if(type.equals("GET"))
-                val = sendGETRequest(url, params);
-            else if(type.equals("POST"))
-                val = sendPOSTRequest(url, params);
-            else
-                val = null;
-
-            try {
-                returnJson.set(new JSONObject(val));
-            } catch (JSONException jsonException) {
-                jsonException.printStackTrace();
-            }
-        }));
-
-        try {
-            es.invokeAll(asyncFunction);
-            // istruzioni fatte dopo il richiamo
-            return returnJson.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-
-            return returnJson.get();
-        }
-    }
-
+    /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
     public boolean checkSession(){
         JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
         boolean isDone = false;
 
         try {
-            isDone = Boolean.parseBoolean(json.get("done").toString());
+            isDone = json.getBoolean("done");
 
-            if(isDone) {
-                Users user = new Users(json.get("name").toString(), json.get("email").toString());
-                networkData.updateUser(user); // aggiorna i live data
-            }
+            if(isDone)
+                usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -95,22 +68,22 @@ public class NetworkViewModel extends AndroidViewModel{
         return isDone;
     }
 
-    public boolean registerUser(String name, String email, String password) {
+    public boolean registerUser(String account, String password, String name, String surname) {
         HashMap<String, String> items = new HashMap<String, String>();
-        items.put("name", name);
-        items.put("email", email);
+        items.put("account", account);
         items.put("password", password);
+        items.put("name", name);
+        items.put("surname", surname);
 
         JSONObject json = launchThread(myURLs.getServerUrlRegistration(), items, "POST");
         boolean isDone = false;
 
         try {
-            isDone = Boolean.parseBoolean(json.get("done").toString());
+            isDone = json.getBoolean("done");
 
-            if(isDone) {
-                Users user = new Users(json.get("name").toString(), json.get("email").toString());
-                networkData.updateUser(user); // aggiorna i live data
-            }
+            if(isDone)
+                usersData.updateUser(new User(json.getString("account"), json.getString("pwd"), json.getString("role"), json.getString("name"), json.getString("surname"))); // aggiorna i live data
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -118,20 +91,20 @@ public class NetworkViewModel extends AndroidViewModel{
         return isDone;
     }
 
-    public boolean loginUser(String email, String password) {
+    public boolean loginUser(String account, String password) {
         HashMap<String, String> items = new HashMap<String, String>();
-        items.put("email", email);
+        items.put("account", account);
         items.put("password", password);
 
         JSONObject json = launchThread(myURLs.getServerUrlLogin(), items, "POST");
         boolean isDone = false;
 
         try {
-            isDone = Boolean.parseBoolean(json.get("done").toString());
+            isDone = json.getBoolean("done");
 
-            if(isDone) {
-                networkData.updateUser(new Users(json.get("name").toString(), email));
-            }
+            if(isDone)
+                usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -139,6 +112,55 @@ public class NetworkViewModel extends AndroidViewModel{
         return isDone;
     }
 
+    public boolean fetchBookedRepetitions(){
+        JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST");
+
+        // DATA FORMAT EXAMPLE
+        /*
+        * JSONObject myJSON = {
+        *   done : true,
+        *   results : [
+        *               {
+        *                day:monday,
+        *                startTime:15:00,
+        *                IDCourse:5,
+        *                IDTeacher:3
+        *               },
+        *               {
+         *               day:tuesday,
+         *               startTime:17:00,
+         *               IDCourse:3,
+         *               IDTeacher:1
+         *              }
+        *             ]
+        * }
+        * */
+
+        boolean isDone = false;
+
+        try {
+            isDone = jsonResult.getBoolean("done");
+
+            if(isDone) {
+                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
+                JSONArray jsonArray = jsonResult.getJSONArray("results");
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonItem = jsonArray.getJSONObject(i);
+                    BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                    bookedRepetitions.add(item);
+                }
+                bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return isDone;
+    }
+    /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
+
+
+    /*utility methods*/
     private String sendPOSTRequest(String urlServer, HashMap<String, String> params) {
         HttpURLConnection conn = null;
 
@@ -233,4 +255,37 @@ public class NetworkViewModel extends AndroidViewModel{
         }
         return result.toString();
     }
+
+    public JSONObject launchThread(String url, HashMap<String, String> params, String type) {
+        AtomicReference<JSONObject> returnJson = new AtomicReference<>();
+        ExecutorService es = Executors.newSingleThreadExecutor();
+
+        List<Callable<Object>> asyncFunction = new ArrayList<>();
+        asyncFunction.add(Executors.callable(() -> {
+            String val;
+            if(type.equals("GET"))
+                val = sendGETRequest(url, params);
+            else if(type.equals("POST"))
+                val = sendPOSTRequest(url, params);
+            else
+                val = null;
+
+            try {
+                returnJson.set(new JSONObject(val));
+            } catch (JSONException jsonException) {
+                jsonException.printStackTrace();
+            }
+        }));
+
+        try {
+            es.invokeAll(asyncFunction);
+            // istruzioni fatte dopo il richiamo
+            return returnJson.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+
+            return returnJson.get();
+        }
+    }
+
 }

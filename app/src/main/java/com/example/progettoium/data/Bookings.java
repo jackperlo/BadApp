@@ -1,32 +1,32 @@
 package com.example.progettoium.data;
 
 public class Bookings {
-    int codTeacher;
-    int codCourse;
-    int codUser;
+    int IDTeacher;
+    int IDCourse;
+    int account;
     String day;
     String startTime;
-    String endTime;
+    String state;
 
-    public Bookings(int codTeacher, int codCourse, int codUser, String day, String startTime, String endTime) {
-        this.codTeacher = codTeacher;
-        this.codCourse = codCourse;
-        this.codUser = codUser;
+    public Bookings(int IDTeacher, int IDCourse, int account, String day, String startTime, String state) {
+        this.IDTeacher = IDTeacher;
+        this.IDCourse = IDCourse;
+        this.account = account;
         this.day = day;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.state = state;
     }
 
-    public int getCodTeacher() {
-        return codTeacher;
+    public int getIDTeacher() {
+        return IDTeacher;
     }
 
-    public int getCodCourse() {
-        return codCourse;
+    public int getIDCourse() {
+        return IDCourse;
     }
 
-    public int getCodUser() {
-        return codUser;
+    public int getAccount() {
+        return account;
     }
 
     public String getDay() {
@@ -37,7 +37,7 @@ public class Bookings {
         return startTime;
     }
 
-    public String getEndTime() {
-        return endTime;
+    public String getState() {
+        return state;
     }
 }

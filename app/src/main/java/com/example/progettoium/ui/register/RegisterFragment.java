@@ -34,11 +34,15 @@ public class RegisterFragment extends Fragment {
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateName(binding.name) && validateEmail(binding.email) && validatePassword(binding.password)) {
+                if(validateSurname(binding.surname) && validateName(binding.name) && validateEmail(binding.email) && validatePassword(binding.password)) {
                     String password = binding.password.getText().toString();
                     if(valideteRetypePassword(binding.retypePassword, password)) {
                         binding.loading.setVisibility(View.VISIBLE);
-                        if (networkViewModel.registerUser(binding.name.getText().toString(), binding.email.getText().toString(), password)) {
+
+                        // N.B. Gli Admin vanno aggiunti direttamente dal phpmyadmin!
+                        //QUI TUTTE LE REGISTRAZIONI SONO DI ROLE 'CLIENT'
+
+                        if (networkViewModel.registerUser(binding.email.getText().toString(), password, binding.name.getText().toString(), binding.surname.getText().toString())) {
                             NavHostFragment.findNavController(RegisterFragment.this)
                                     .navigate(R.id.action_nav_register_to_nav_home);
                         } else {
@@ -52,6 +56,18 @@ public class RegisterFragment extends Fragment {
 
         return root;
     }
+
+    private boolean validateSurname(EditText surname) {
+        String val = surname.getText().toString();
+        if(val.isEmpty()) {
+            surname.setError("Field cannot be empty");
+            return false;
+        } else {
+            surname.setError(null);
+            return true;
+        }
+    }
+
 
     private boolean validateName(EditText name) {
         String val = name.getText().toString();

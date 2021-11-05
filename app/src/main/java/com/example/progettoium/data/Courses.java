@@ -1,16 +1,16 @@
 package com.example.progettoium.data;
 
 public class Courses {
-    int codCourse;
+    int IDCourse;
     String title;
 
-    public Courses(int codCourse, String title) {
-        this.codCourse = codCourse;
+    public Courses(int IDCourse, String title) {
+        this.IDCourse = IDCourse;
         this.title = title;
     }
 
-    public int getCodCourse() {
-        return codCourse;
+    public int getIDCourse() {
+        return IDCourse;
     }
 
     public String getTitle() { return title; }

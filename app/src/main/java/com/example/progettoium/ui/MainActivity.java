@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
             TextView txtNome = findViewById(R.id.txtNameSurname);
             TextView txtMail = findViewById(R.id.txtMail);
 
-            txtNome.setText(ite.getName());
-            txtMail.setText(ite.getEmail());
+            txtNome.setText(ite.getName() + " " + ite.getSurname());
+            txtMail.setText(ite.getAccount());
         });
 
         //model.checkSession();

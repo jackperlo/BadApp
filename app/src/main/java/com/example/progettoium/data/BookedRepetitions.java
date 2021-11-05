@@ -2,17 +2,17 @@ package com.example.progettoium.data;
 
 import java.util.ArrayList;
 
-public class CoursesTimeTable {
+public class BookedRepetitions {
     String day;
     String startTime;
-    String endTime;
-    int codCourse;
+    int IDCourse;
+    int IDTeacher;
 
-    public CoursesTimeTable(String day, String startTime, String endTime, int codCourse) {
+    public BookedRepetitions(String day, String startTime, int IDCourse, int IDTeacher) {
         this.day = day;
         this.startTime = startTime;
-        this.endTime = endTime;
-        this.codCourse = codCourse;
+        this.IDCourse = IDCourse;
+        this.IDTeacher = IDTeacher;
     }
 
     public String getDay() {
@@ -23,26 +23,22 @@ public class CoursesTimeTable {
         return startTime;
     }
 
-    public String getEndTime() {
-        return endTime;
+    public int getIDCourse() {
+        return IDCourse;
     }
 
-    public int getCodCourse() {
-        return codCourse;
+    public int getIDTeacher() {
+        return IDTeacher;
     }
-
-    public CoursesTimeTable() {
-    }
-
+/*
     public static ArrayList<CoursesTimeTable> createCourses() {
         ArrayList<CoursesTimeTable> allCourses = new ArrayList<CoursesTimeTable>();
         for (int i = 0; i < 15; i++){
             CoursesTimeTable course = new CoursesTimeTable();
-            course.codCourse = i;
+            course.IDCourse = i;
             course.startTime = ""+i;
-            course.endTime = ""+(i+1);
             allCourses.add(course);
         }
         return allCourses;
-    }
+    }*/
 }

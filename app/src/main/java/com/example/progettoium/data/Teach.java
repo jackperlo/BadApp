@@ -1,19 +1,19 @@
 package com.example.progettoium.data;
 
 public class Teach {
-    int codTeacher;
-    int codCourse;
+    int IDTeacher;
+    int IDCourse;
 
-    public Teach(int codTeacher, int codCourse) {
-        this.codTeacher = codTeacher;
-        this.codCourse = codCourse;
+    public Teach(int IDTeacher, int IDCourse) {
+        this.IDTeacher = IDTeacher;
+        this.IDCourse = IDCourse;
     }
 
-    public int getCodTeacher() {
-        return codTeacher;
+    public int getIDTeacher() {
+        return IDTeacher;
     }
 
-    public int getCodCourse() {
-        return codCourse;
+    public int getIDCourse() {
+        return IDCourse;
     }
 }

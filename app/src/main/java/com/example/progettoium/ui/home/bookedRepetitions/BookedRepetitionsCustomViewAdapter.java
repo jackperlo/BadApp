@@ -1,4 +1,4 @@
-package com.example.progettoium.ui.home.courses;
+package com.example.progettoium.ui.home.bookedRepetitions;
 
 
 import android.content.Context;
@@ -15,15 +15,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import com.example.progettoium.R;
-import com.example.progettoium.data.CoursesTimeTable;
+import com.example.progettoium.data.BookedRepetitions;
 
-public class CoursesCustomViewAdapter extends RecyclerView.Adapter<CoursesCustomViewAdapter.ViewHolder> {
+public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<BookedRepetitionsCustomViewAdapter.ViewHolder> {
 
-    private List<CoursesTimeTable> mData;
+    private List<BookedRepetitions> mData;
     private LayoutInflater mInflater;
 
     // data is passed into the constructor
-    public CoursesCustomViewAdapter(Context context, List<CoursesTimeTable> data) {
+    public BookedRepetitionsCustomViewAdapter(Context context, List<BookedRepetitions> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -36,12 +36,15 @@ public class CoursesCustomViewAdapter extends RecyclerView.Adapter<CoursesCustom
     }
 
     // binds the data to the TextView in each row
+    //TODO: PER OGNI ROW METTO TUTTO, ESCLUDO LE ROW CHE SONO NEI LIVEDATA E QUINDI SONO GIA PRENOTATE
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        CoursesTimeTable course = mData.get(position);
-        holder.lbl_CourseStartTime.setText(course.getStartTime());
-        holder.lbl_CourseEndTime.setText(course.getEndTime());
-        holder.lbl_CourseDisplayer.setText(""+course.getCodCourse()); //E' UN INT
+        BookedRepetitions course = mData.get(position);
+        holder.lbl_CourseStartTime.setText(""+course.getStartTime());
+        String [] temp = course.getStartTime().split(":");
+        int endTime = Integer.parseInt(temp[0]) + 1;
+        holder.lbl_CourseEndTime.setText(""+endTime+":00");
+        holder.lbl_CourseDisplayer.setText(""+course.getIDCourse()); //E' UN INT
     }
 
     // total number of rows
@@ -72,7 +75,7 @@ public class CoursesCustomViewAdapter extends RecyclerView.Adapter<CoursesCustom
         }
     }
 
-    public void setData(List<CoursesTimeTable> newData) {
+    public void setData(List<BookedRepetitions> newData) {
 
         // Versione vecchia:  notifyDataSetChanged(); aggiorna TUTTA la lista
         if (mData != null) {
@@ -89,9 +92,9 @@ public class CoursesCustomViewAdapter extends RecyclerView.Adapter<CoursesCustom
 
     class PostDiffCallback extends DiffUtil.Callback {
 
-        private final List<CoursesTimeTable> oldPosts, newPosts;
+        private final List<BookedRepetitions> oldPosts, newPosts;
 
-        public PostDiffCallback(List<CoursesTimeTable> oldPosts, List<CoursesTimeTable> newPosts) {
+        public PostDiffCallback(List<BookedRepetitions> oldPosts, List<BookedRepetitions> newPosts) {
             this.oldPosts = oldPosts;
             this.newPosts = newPosts;
         }
@@ -108,7 +111,7 @@ public class CoursesCustomViewAdapter extends RecyclerView.Adapter<CoursesCustom
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldPosts.get(oldItemPosition).getCodCourse() == newPosts.get(newItemPosition).getCodCourse();
+            return ((oldPosts.get(oldItemPosition).getDay() == newPosts.get(newItemPosition).getDay()) && (oldPosts.get(oldItemPosition).getStartTime() == newPosts.get(newItemPosition).getStartTime()) && (oldPosts.get(oldItemPosition).getIDCourse() == newPosts.get(newItemPosition).getIDCourse()) && (oldPosts.get(oldItemPosition).getIDTeacher() == newPosts.get(newItemPosition).getIDTeacher()));
         }
 
         @Override

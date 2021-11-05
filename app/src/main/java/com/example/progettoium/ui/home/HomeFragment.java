@@ -1,10 +1,10 @@
 package com.example.progettoium.ui.home;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,35 +15,43 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
-import com.example.progettoium.ui.home.courses.CoursesCustomViewAdapter;
-import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModel;
-import com.example.progettoium.ui.home.courses.CoursesTimeTableViewModelFactory;
+import com.example.progettoium.ui.home.bookedRepetitions.BookedRepetitionsCustomViewAdapter;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
     private NetworkViewModel networkViewModel;
-    CoursesTimeTableViewModel coursesViewModel;
+    //CoursesTimeTableLiveData coursesViewModel;
     private FragmentHomeBinding binding;
 
-    CoursesCustomViewAdapter adapter;
+    BookedRepetitionsCustomViewAdapter adapter;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        //setting up recycler view to show courses
-        CoursesTimeTableViewModelFactory factory = new CoursesTimeTableViewModelFactory(getContext());
-        coursesViewModel = new ViewModelProvider(this, factory).get(CoursesTimeTableViewModel.class);
         RecyclerView recyclerView = binding.coursesList;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new CoursesCustomViewAdapter(getContext(), new ArrayList());
+        adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList());
         recyclerView.setAdapter(adapter);
-        coursesViewModel.fetchCourses();
+        networkViewModel.fetchBookedRepetitions();
+
+        TabLayout tabLayout = binding.tabLayout;
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                String aus = ""+tab.getPosition();
+                Toast.makeText(getContext(),aus, Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
 
         return root;
     }
@@ -54,16 +62,12 @@ public class HomeFragment extends Fragment {
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), ite -> {
-            binding.lblWelcomeMainFragment.setText("Hi, " + ite.getName());
+            binding.lblWelcomeMainFragment.setText("Hi, " + ite.getName() + " " +ite.getSurname());
         });
-
-        coursesViewModel.getCourses().observe(getViewLifecycleOwner(), courseObjects -> {
-            Log.i("Home Fragment", "numero corsi: " + courseObjects.size());
-            if (courseObjects.size() > 0) {
-                Log.i("Home Fragment", "Corso: " + courseObjects.get(0).getCodCourse() + " | Start: " + courseObjects.get(0).getStartTime());
-            }
+        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             adapter.setData(courseObjects);  // setta i dati nella recyclerView
         });
+
     }
 
     @Override
