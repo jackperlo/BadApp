@@ -50,20 +50,22 @@ public class MainActivity extends AppCompatActivity {
             txtMail.setText(ite.getAccount());
         });
 
-        //model.checkSession();
-
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
         DrawerLayout drawer = mainActivityBinding.drawerLayout;
         NavigationView navigationView = mainActivityBinding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_login)
+                R.id.nav_home, R.id.nav_login, R.id.nav_booking)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        //model.checkSession();
+        //TODO: renderlo invisibile solo se non è loggato. Da fare dopo la check session
+        navigationView.getMenu().findItem(R.id.nav_booking).setVisible(false);
     }
 
     @Override

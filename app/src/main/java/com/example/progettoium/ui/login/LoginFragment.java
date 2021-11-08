@@ -13,9 +13,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentLoginBinding;
+import com.google.android.material.navigation.NavigationView;
 
 public class LoginFragment extends Fragment {
 
@@ -45,10 +47,14 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 if(validateEmail(binding.email) && validatePassword(binding.password)) {
                     if(networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())){
+                        NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                        navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                        navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
+
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_nav_login_to_nav_home);
                     } else {
-                        Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Login Failed! T ry Again", Toast.LENGTH_LONG).show();
                     }
                 }
             }

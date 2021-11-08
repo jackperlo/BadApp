@@ -14,10 +14,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -164,16 +166,9 @@ public class NetworkViewModel extends AndroidViewModel{
     private String sendPOSTRequest(String urlServer, HashMap<String, String> params) {
         HttpURLConnection conn = null;
 
-        urlServer += "?";
         JsonObject jsonObject = new JsonObject();
-        int i = 0;
         for(String itemKey : params.keySet()){
             jsonObject.addProperty(itemKey, params.get(itemKey));
-            if(i == 0)
-                urlServer += itemKey + "=" + params.get(itemKey);
-            else
-                urlServer+= "&" + itemKey + "=" +params.get(itemKey);
-            i++;
         }
 
         try {
@@ -186,9 +181,11 @@ public class NetworkViewModel extends AndroidViewModel{
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             conn.setDoOutput(true);
 
-            String data = jsonObject.toString();
             try(OutputStream os = conn.getOutputStream()){
-                os.write(data.getBytes(StandardCharsets.UTF_8));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(String.valueOf(jsonObject));
+                writer.flush();
+                writer.close();
             }
 
             conn.connect();
