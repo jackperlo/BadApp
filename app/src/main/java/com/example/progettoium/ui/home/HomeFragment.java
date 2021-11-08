@@ -36,7 +36,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView recyclerView = binding.coursesList;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList());
+        adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
         networkViewModel.fetchBookedRepetitions();
 
@@ -61,8 +61,8 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
-        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), ite -> {
-            binding.lblWelcomeMainFragment.setText("Hi, " + ite.getName() + " " +ite.getSurname());
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
         });
         networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             adapter.setData(courseObjects);  // setta i dati nella recyclerView

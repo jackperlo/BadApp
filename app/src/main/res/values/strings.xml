@@ -46,4 +46,8 @@
     <string name="register">Register</string>
     <string name="sign_up_to_continue">Sign Up to continue</string>
     <string name="le_mie_prenotazioni">Le mie Prenotazioni</string>
+    <string name="indietro">INDIETRO</string>
+    <string name="attive">Attive</string>
+    <string name="cancellate">Cancellate</string>
+    <string name="seguite">Seguite</string>
 </resources>

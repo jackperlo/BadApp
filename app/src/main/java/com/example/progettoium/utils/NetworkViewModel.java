@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class NetworkViewModel extends AndroidViewModel{
     private final UserLiveData usersData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
+    private int selectedHistoryTab = 0;
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -107,6 +108,67 @@ public class NetworkViewModel extends AndroidViewModel{
             if(isDone)
                 usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return isDone;
+    }
+
+    public void setSelectedHistoryTab(int selectedHistoryTab) {
+        this.selectedHistoryTab = selectedHistoryTab;
+    }
+
+    public boolean fetchBookedHistory() {
+        HashMap<String, String> items = new HashMap<String, String>();
+
+        String state = "Active";
+        if(selectedHistoryTab == 0)
+            state = "Active";
+        else if(selectedHistoryTab == 1)
+            state = "Canelled";
+        else
+            state = "Done";
+
+        items.put("state", state);
+        JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST");
+
+        // DATA FORMAT EXAMPLE
+        /*
+         * JSONObject myJSON = {
+         *   done : true,
+         *   results : [
+         *               {
+         *                day:monday,
+         *                startTime:15:00,
+         *                IDCourse:5,
+         *                IDTeacher:3
+         *               },
+         *               {
+         *               day:tuesday,
+         *               startTime:17:00,
+         *               IDCourse:3,
+         *               IDTeacher:1
+         *              }
+         *             ]
+         * }
+         * */
+
+        boolean isDone = false;
+
+        try {
+            isDone = jsonResult.getBoolean("done");
+
+            if(isDone) {
+                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
+                JSONArray jsonArray = jsonResult.getJSONArray("results");
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonItem = jsonArray.getJSONObject(i);
+                    BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                    bookedRepetitions.add(item);
+                }
+                bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
