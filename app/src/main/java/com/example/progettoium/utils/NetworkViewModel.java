@@ -18,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectStreamException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -39,6 +40,7 @@ public class NetworkViewModel extends AndroidViewModel{
     private final UserLiveData usersData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
     private int selectedHistoryTab = 0;
+    private boolean isConnected = false;
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -115,12 +117,32 @@ public class NetworkViewModel extends AndroidViewModel{
         return isDone;
     }
 
+    public boolean isConnected() {
+        return this.isConnected;
+    }
+
+    public boolean testServerConnection() {
+        boolean isConnected = false;
+
+        //TODO: creare servlet
+        JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
+
+        try {
+            isConnected = json.getBoolean("no_connection");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        this.isConnected = isConnected;
+        return isConnected;
+    }
+
     public void setSelectedHistoryTab(int selectedHistoryTab) {
         this.selectedHistoryTab = selectedHistoryTab;
     }
 
     public boolean fetchBookedHistory() {
-        HashMap<String, String> items = new HashMap<String, String>();
+        HashMap<String, String> items = new HashMap<>();
 
         String state = "Active";
         if(selectedHistoryTab == 0)
@@ -206,7 +228,7 @@ public class NetworkViewModel extends AndroidViewModel{
             isDone = jsonResult.getBoolean("done");
 
             if(isDone) {
-                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
+                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<>();
                 JSONArray jsonArray = jsonResult.getJSONArray("results");
                 for (int i = 0; i < jsonArray.length(); ++i) {
                     JSONObject jsonItem = jsonArray.getJSONObject(i);
@@ -237,7 +259,7 @@ public class NetworkViewModel extends AndroidViewModel{
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setConnectTimeout(10000 /* milliseconds */);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -257,7 +279,7 @@ public class NetworkViewModel extends AndroidViewModel{
             return readIt(conn.getInputStream());
         } catch (Exception ex) {
             Log.e("async", ex.getMessage());
-            return null;
+            return "no_connection";
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -296,7 +318,7 @@ public class NetworkViewModel extends AndroidViewModel{
             return readIt(conn.getInputStream());
         } catch (Exception ex) {
             Log.e("async", ex.getMessage());
-            return null;
+            return "no_connection";
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -330,7 +352,10 @@ public class NetworkViewModel extends AndroidViewModel{
                 val = null;
 
             try {
-                returnJson.set(new JSONObject(val));
+                if(val == "no_connection") {
+                    returnJson.set(new JSONObject("{'no_connection':true, 'done':false}"));
+                } else
+                    returnJson.set(new JSONObject(val));
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }

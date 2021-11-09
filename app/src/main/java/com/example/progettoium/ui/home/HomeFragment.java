@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
-        networkViewModel.fetchBookedRepetitions();
 
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -60,14 +59,18 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /*TRYING TO GET DATA FROM LIVEDATA*/
-        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
-        });
-        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            adapter.setData(courseObjects);  // setta i dati nella recyclerView
-        });
-
+        if(networkViewModel.isConnected()) {
+            networkViewModel.fetchBookedRepetitions();
+            /*TRYING TO GET DATA FROM LIVEDATA*/
+            networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+                binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
+            });
+            networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
+                adapter.setData(courseObjects);  // setta i dati nella recyclerView
+            });
+        } else {
+            // Polling...
+        }
     }
 
     @Override
