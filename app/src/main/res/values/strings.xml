@@ -15,7 +15,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
+    <string name="welcome">WELCOME</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
@@ -41,13 +41,16 @@
     <string name="surname">Surname</string>
     <string name="password">Password</string>
     <string name="email">mario.rossi@email.com</string>
-    <string name="re_type_password">Re-type Password</string>
+    <string name="re_type_password">Confirm password</string>
     <string name="sign_up">Sign Up</string>
-    <string name="register">Register</string>
+    <string name="register">Registration</string>
     <string name="sign_up_to_continue">Sign Up to continue</string>
     <string name="le_mie_prenotazioni">Le mie Prenotazioni</string>
     <string name="indietro">INDIETRO</string>
     <string name="attive">Attive</string>
     <string name="cancellate">Cancellate</string>
     <string name="seguite">Seguite</string>
+    <string name="createaccount">Create account</string>
+    <string name="createanewaccount">Create a new account</string>
+
 </resources>

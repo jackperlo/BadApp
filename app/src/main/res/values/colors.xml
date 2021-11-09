@@ -15,4 +15,5 @@
     <color name="MAIN_COLOR_FADED">#c7f3ff</color>
     <color name="MAIN_BACKGROUND">#f3f3f3</color>
     <color name="TEXT">#DD616060</color>
+    <color name="HINT_COLOR">#CBE7FD</color>
 </resources>
