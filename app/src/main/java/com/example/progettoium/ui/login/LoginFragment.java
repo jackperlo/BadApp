@@ -34,6 +34,8 @@ public class LoginFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
+        networkViewModel.testServerConnection("0");
+
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

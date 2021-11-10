@@ -31,6 +31,8 @@ public class RegisterFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
+        networkViewModel.testServerConnection("0");
+
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

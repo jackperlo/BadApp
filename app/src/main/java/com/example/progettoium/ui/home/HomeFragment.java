@@ -54,11 +54,17 @@ public class HomeFragment extends Fragment {
         });
 
         networkViewModel.getIsConnected().observe(getViewLifecycleOwner(), connected -> {
-            Log.d("NetworkWiewModel", "Observe " + connected);
-            if(connected)
+            if(connected) {
+                binding.imgNoConnection.setVisibility(View.INVISIBLE);
+                binding.txtNoConnection.setVisibility(View.INVISIBLE);
+                binding.linearLayoutBooking.setVisibility(View.VISIBLE);
                 networkViewModel.fetchBookedRepetitions();
-            else
-                networkViewModel.pollingTestServerConnection();
+            } else {
+                binding.imgNoConnection.setVisibility(View.VISIBLE);
+                binding.txtNoConnection.setVisibility(View.VISIBLE);
+                binding.linearLayoutBooking.setVisibility(View.INVISIBLE);
+                networkViewModel.testServerConnection("5000");
+            }
         });
 
         TabLayout tabLayout = binding.tabLayout;

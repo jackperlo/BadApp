@@ -2,9 +2,11 @@ package com.example.progettoium.utils;
 
 import android.app.ActivityOptions;
 import android.app.Application;
+import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 
 import com.example.progettoium.data.BookedRepetitions;
@@ -13,6 +15,7 @@ import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.ui.SplashScreen;
 import com.google.gson.JsonObject;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 
 import org.json.JSONArray;
@@ -150,23 +153,9 @@ public class NetworkViewModel extends AndroidViewModel {
         return isDone;
     }
 
-    public void testServerConnection() {
+    public void testServerConnection(String timeout) {
         //TODO: creare servlet
-        new ThreadAsync().execute(myURLs.getServerUrlCheckSession());
-    }
-
-    public void pollingTestServerConnection() {
-        testServerConnection();
-
-        if(!getIsConnected().getValue()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            pollingTestServerConnection();
-        } else
-            Log.d("Network", "CONNECTED");
+        new CheckConnectionAsync().execute(myURLs.getServerUrlCheckSession(), timeout);
     }
 
     public void setSelectedHistoryTab(int selectedHistoryTab) {
@@ -298,8 +287,8 @@ public class NetworkViewModel extends AndroidViewModel {
         try {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(5000 /* milliseconds */);
+            conn.setReadTimeout(5000 /* milliseconds */);
+            conn.setConnectTimeout(2000 /* milliseconds */);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -346,8 +335,8 @@ public class NetworkViewModel extends AndroidViewModel {
         try {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(5000 /* milliseconds */);
+            conn.setReadTimeout(5000 /* milliseconds */);
+            conn.setConnectTimeout(2000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 
@@ -412,19 +401,15 @@ public class NetworkViewModel extends AndroidViewModel {
         }
     }
 
-    /*public void launchThreadNotBlocking(String url) {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-            }
-        };
-
-        thread.start();
-    }*/
-
-    public class ThreadAsync extends AsyncTask<String, Void, String> {
+    public class CheckConnectionAsync extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
+            try {
+
+                Thread.sleep(Integer.parseInt(strings[1]));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return sendPOSTRequest(strings[0], new HashMap<>());
         }
 

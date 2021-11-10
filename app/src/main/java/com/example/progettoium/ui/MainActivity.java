@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        model.testServerConnection();
+        model.testServerConnection("0");
 
         //model.checkSession();
         //TODO: renderlo invisibile solo se non è loggato. Da fare dopo la check session
