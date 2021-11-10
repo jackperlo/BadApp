@@ -1,6 +1,7 @@
 package com.example.progettoium.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        model.testServerConnection();
 
         //model.checkSession();
         //TODO: renderlo invisibile solo se non è loggato. Da fare dopo la check session

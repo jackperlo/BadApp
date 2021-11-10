@@ -1,10 +1,15 @@
 package com.example.progettoium.utils;
 
+import android.app.ActivityOptions;
 import android.app.Application;
+import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 import com.example.progettoium.data.BookedRepetitions;
 import com.example.progettoium.data.User;
+import com.example.progettoium.ui.MainActivity;
+import com.example.progettoium.ui.SplashScreen;
 import com.google.gson.JsonObject;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -29,112 +34,148 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 /*
-* View Model di interfaccia con la rete internet
-*/
-public class NetworkViewModel extends AndroidViewModel{
+ * View Model di interfaccia con la rete internet
+ */
+public class NetworkViewModel extends AndroidViewModel {
     private final UserLiveData usersData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
     private int selectedHistoryTab = 0;
-    private boolean isConnected = false;
+    private final ConnectionLiveData isConnected;
 
     public NetworkViewModel(Application application) {
         super(application);
 
+        Log.d("Costruttore", "costruttore");
+
         usersData = new UserLiveData();
         bookedRepetitionsData = new BookedRepetitionsLiveData();
+        isConnected = new ConnectionLiveData();
     }
 
     /*GETTING DATA FROM LIVE DATA ALREADY FILLED UP FROM DB QUERIES*/
-    public UserLiveData getRegisteredUser() { return usersData; }
+    public UserLiveData getRegisteredUser() {
+        return usersData;
+    }
 
-    public BookedRepetitionsLiveData getBookedRepetitions(){ return bookedRepetitionsData; }
+    public BookedRepetitionsLiveData getBookedRepetitions() {
+        return bookedRepetitionsData;
+    }
+
+    public ConnectionLiveData getIsConnected() {
+        return isConnected;
+    }
     /*END GETTING DATA FROM LIVE DATA*/
 
     /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
-    public boolean checkSession(){
-        JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
+    public boolean checkSession() {
         boolean isDone = false;
 
-        try {
-            isDone = json.getBoolean("done");
+        if (getIsConnected().getValue().equals("connected")) {
+            JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
 
-            if(isDone)
-                usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
+            try {
+                isDone = json.getBoolean("done");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+                if (isDone)
+                    usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
+                else {
+                    //TODO: non c'è connessione, cosa fare?
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         return isDone;
     }
 
     public boolean registerUser(String account, String password, String name, String surname) {
-        HashMap<String, String> items = new HashMap<String, String>();
-        items.put("account", account);
-        items.put("password", password);
-        items.put("name", name);
-        items.put("surname", surname);
-
-        JSONObject json = launchThread(myURLs.getServerUrlRegistration(), items, "POST");
         boolean isDone = false;
 
-        try {
-            isDone = json.getBoolean("done");
+        if (getIsConnected().getValue().equals("connected")) {
+            HashMap<String, String> items = new HashMap<String, String>();
+            items.put("account", account);
+            items.put("password", password);
+            items.put("name", name);
+            items.put("surname", surname);
 
-            if(isDone)
-                usersData.updateUser(new User(json.getString("account"), json.getString("pwd"), json.getString("role"), json.getString("name"), json.getString("surname"))); // aggiorna i live data
+            JSONObject json = launchThread(myURLs.getServerUrlRegistration(), items, "POST");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            try {
+                isDone = json.getBoolean("done");
+
+                if (isDone)
+                    usersData.updateUser(new User(json.getString("account"), json.getString("pwd"), json.getString("role"), json.getString("name"), json.getString("surname"))); // aggiorna i live data
+                else {
+                    isConnected.updateConnection("no_connection");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         return isDone;
     }
 
     public boolean loginUser(String account, String password) {
-        HashMap<String, String> items = new HashMap<String, String>();
-        items.put("account", account);
-        items.put("password", password);
-
-        JSONObject json = launchThread(myURLs.getServerUrlLogin(), items, "POST");
         boolean isDone = false;
 
-        try {
-            isDone = json.getBoolean("done");
+        if (getIsConnected().getValue().equals("connected")) {
+            HashMap<String, String> items = new HashMap<String, String>();
+            items.put("account", account);
+            items.put("password", password);
 
-            if(isDone)
-                usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
+            JSONObject json = launchThread(myURLs.getServerUrlLogin(), items, "POST");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            try {
+                isDone = json.getBoolean("done");
+
+                if (isDone)
+                    usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
+                else {
+                    isConnected.updateConnection("no_connection");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         return isDone;
     }
 
-    public boolean isConnected() {
-        return this.isConnected;
+    public void testServerConnection() {
+        //TODO: creare servlet
+        launchThreadNotBlocking(myURLs.getServerUrlCheckSession());
     }
 
-    public boolean testServerConnection() {
-        boolean isConnected = false;
+    public void pollingTestServerConnection() {
+        boolean value = getIsConnected().getValue().equals("connected");
+        int count = 0;
+        while (!value) {
+            isConnected.updateConnection("connected");
+            value = getIsConnected().getValue().equals("connected");
+            Log.d("Network", "Riconnessione.. " + value);
+            /*try {
+                Thread.sleep(5000);
+                testServerConnection();
+                value = getIsConnected().getValue().equals("connected");
+                count++;
 
-        //TODO: creare servlet
-        JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
-
-        try {
-            isConnected = json.getBoolean("no_connection");
-        } catch (JSONException e) {
-            e.printStackTrace();
+                if(count == 3)
+                    isConnected.updateConnection("connected");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
         }
 
-        this.isConnected = isConnected;
-        return isConnected;
+        if (getIsConnected().getValue().equals("connected"))
+            Log.d("Network", "CONNECTED");
     }
 
     public void setSelectedHistoryTab(int selectedHistoryTab) {
@@ -142,103 +183,111 @@ public class NetworkViewModel extends AndroidViewModel{
     }
 
     public boolean fetchBookedHistory() {
-        HashMap<String, String> items = new HashMap<>();
-
-        String state = "Active";
-        if(selectedHistoryTab == 0)
-            state = "Active";
-        else if(selectedHistoryTab == 1)
-            state = "Canelled";
-        else
-            state = "Done";
-
-        items.put("state", state);
-        JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST");
-
-        // DATA FORMAT EXAMPLE
-        /*
-         * JSONObject myJSON = {
-         *   done : true,
-         *   results : [
-         *               {
-         *                day:monday,
-         *                startTime:15:00,
-         *                IDCourse:5,
-         *                IDTeacher:3
-         *               },
-         *               {
-         *               day:tuesday,
-         *               startTime:17:00,
-         *               IDCourse:3,
-         *               IDTeacher:1
-         *              }
-         *             ]
-         * }
-         * */
-
         boolean isDone = false;
 
-        try {
-            isDone = jsonResult.getBoolean("done");
+        if (getIsConnected().getValue().equals("connected")) {
+            HashMap<String, String> items = new HashMap<>();
 
-            if(isDone) {
-                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
-                JSONArray jsonArray = jsonResult.getJSONArray("results");
-                for (int i = 0; i < jsonArray.length(); ++i) {
-                    JSONObject jsonItem = jsonArray.getJSONObject(i);
-                    BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
-                    bookedRepetitions.add(item);
+            String state = "Active";
+            if (selectedHistoryTab == 0)
+                state = "Active";
+            else if (selectedHistoryTab == 1)
+                state = "Canelled";
+            else
+                state = "Done";
+
+            items.put("state", state);
+            JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST");
+
+            // DATA FORMAT EXAMPLE
+            /*
+             * JSONObject myJSON = {
+             *   done : true,
+             *   results : [
+             *               {
+             *                day:monday,
+             *                startTime:15:00,
+             *                IDCourse:5,
+             *                IDTeacher:3
+             *               },
+             *               {
+             *               day:tuesday,
+             *               startTime:17:00,
+             *               IDCourse:3,
+             *               IDTeacher:1
+             *              }
+             *             ]
+             * }
+             * */
+
+            try {
+                isDone = jsonResult.getBoolean("done");
+
+                if (isDone) {
+                    ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
+                    JSONArray jsonArray = jsonResult.getJSONArray("results");
+                    for (int i = 0; i < jsonArray.length(); ++i) {
+                        JSONObject jsonItem = jsonArray.getJSONObject(i);
+                        BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                        bookedRepetitions.add(item);
+                    }
+                    bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                } else {
+                    isConnected.updateConnection("no_connection");
                 }
-                bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         return isDone;
     }
 
-    public boolean fetchBookedRepetitions(){
-        JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST");
-
-        // DATA FORMAT EXAMPLE
-        /*
-        * JSONObject myJSON = {
-        *   done : true,
-        *   results : [
-        *               {
-        *                day:monday,
-        *                startTime:15:00,
-        *                IDCourse:5,
-        *                IDTeacher:3
-        *               },
-        *               {
-         *               day:tuesday,
-         *               startTime:17:00,
-         *               IDCourse:3,
-         *               IDTeacher:1
-         *              }
-        *             ]
-        * }
-        * */
-
+    public boolean fetchBookedRepetitions() {
         boolean isDone = false;
 
-        try {
-            isDone = jsonResult.getBoolean("done");
+        if (getIsConnected().getValue().equals("connected")) {
+            JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST");
 
-            if(isDone) {
-                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<>();
-                JSONArray jsonArray = jsonResult.getJSONArray("results");
-                for (int i = 0; i < jsonArray.length(); ++i) {
-                    JSONObject jsonItem = jsonArray.getJSONObject(i);
-                    BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
-                    bookedRepetitions.add(item);
+            // DATA FORMAT EXAMPLE
+            /*
+             * JSONObject myJSON = {
+             *   done : true,
+             *   results : [
+             *               {
+             *                day:monday,
+             *                startTime:15:00,
+             *                IDCourse:5,
+             *                IDTeacher:3
+             *               },
+             *               {
+             *               day:tuesday,
+             *                startTime:17:00,
+             *               IDCourse:3,
+             *               IDTeacher:1
+             *              }
+             *             ]
+             * }
+             * */
+
+            try {
+                isDone = jsonResult.getBoolean("done");
+
+                if (isDone) {
+                    ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<>();
+                    JSONArray jsonArray = jsonResult.getJSONArray("results");
+                    for (int i = 0; i < jsonArray.length(); ++i) {
+                        JSONObject jsonItem = jsonArray.getJSONObject(i);
+                        BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                        bookedRepetitions.add(item);
+                    }
+                    bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                } else {
+                    isConnected.updateConnection("no_connection");
                 }
-                bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         return isDone;
@@ -251,7 +300,7 @@ public class NetworkViewModel extends AndroidViewModel{
         HttpURLConnection conn = null;
 
         JsonObject jsonObject = new JsonObject();
-        for(String itemKey : params.keySet()){
+        for (String itemKey : params.keySet()) {
             jsonObject.addProperty(itemKey, params.get(itemKey));
         }
 
@@ -259,13 +308,13 @@ public class NetworkViewModel extends AndroidViewModel{
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(5000 /* milliseconds */);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             conn.setDoOutput(true);
 
-            try(OutputStream os = conn.getOutputStream()){
+            try (OutputStream os = conn.getOutputStream()) {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                 writer.write(String.valueOf(jsonObject));
                 writer.flush();
@@ -294,12 +343,12 @@ public class NetworkViewModel extends AndroidViewModel{
         urlServer += "?";
         JsonObject jsonObject = new JsonObject();
         int i = 0;
-        for(String itemKey : params.keySet()){
+        for (String itemKey : params.keySet()) {
             jsonObject.addProperty(itemKey, params.get(itemKey));
-            if(i == 0)
+            if (i == 0)
                 urlServer += itemKey + "=" + params.get(itemKey);
             else
-                urlServer+= "&" + itemKey + "=" +params.get(itemKey);
+                urlServer += "&" + itemKey + "=" + params.get(itemKey);
             i++;
         }
 
@@ -307,7 +356,7 @@ public class NetworkViewModel extends AndroidViewModel{
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setConnectTimeout(5000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 
@@ -344,15 +393,15 @@ public class NetworkViewModel extends AndroidViewModel{
         List<Callable<Object>> asyncFunction = new ArrayList<>();
         asyncFunction.add(Executors.callable(() -> {
             String val;
-            if(type.equals("GET"))
+            if (type.equals("GET"))
                 val = sendGETRequest(url, params);
-            else if(type.equals("POST"))
+            else if (type.equals("POST"))
                 val = sendPOSTRequest(url, params);
             else
                 val = null;
 
             try {
-                if(val == "no_connection") {
+                if (val.equals("no_connection")) {
                     returnJson.set(new JSONObject("{'no_connection':true, 'done':false}"));
                 } else
                     returnJson.set(new JSONObject(val));
@@ -372,4 +421,19 @@ public class NetworkViewModel extends AndroidViewModel{
         }
     }
 
+    public void launchThreadNotBlocking(String url) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                String retVal = sendPOSTRequest(url, new HashMap<>());
+                if (retVal.equals("no_connection"))
+                    isConnected.updateConnection(retVal);
+                else
+                    isConnected.updateConnection("connected");
+                Log.d("thread", "thread " + retVal);
+            }
+        };
+
+        thread.start();
+    }
 }

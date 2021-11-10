@@ -45,8 +45,8 @@ public class LoginFragment extends Fragment {
         binding.signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateEmail(binding.email) && validatePassword(binding.password)) {
-                    if(networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())){
+                if (validateEmail(binding.email) && validatePassword(binding.password)) {
+                    if (networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())) {
                         NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                         navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
                         navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
@@ -54,7 +54,7 @@ public class LoginFragment extends Fragment {
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_nav_login_to_nav_home);
                     } else {
-                        Toast.makeText(getContext(), "Login Failed! T ry Again", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
                     }
                 }
             }
