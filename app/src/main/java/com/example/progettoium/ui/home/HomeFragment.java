@@ -53,20 +53,6 @@ public class HomeFragment extends Fragment {
             adapter.setData(courseObjects);  // setta i dati nella recyclerView
         });
 
-        networkViewModel.getIsConnected().observe(getViewLifecycleOwner(), connected -> {
-            if(connected) {
-                binding.imgNoConnection.setVisibility(View.INVISIBLE);
-                binding.txtNoConnection.setVisibility(View.INVISIBLE);
-                binding.linearLayoutBooking.setVisibility(View.VISIBLE);
-                networkViewModel.fetchBookedRepetitions();
-            } else {
-                binding.imgNoConnection.setVisibility(View.VISIBLE);
-                binding.txtNoConnection.setVisibility(View.VISIBLE);
-                binding.linearLayoutBooking.setVisibility(View.INVISIBLE);
-                networkViewModel.testServerConnection("5000");
-            }
-        });
-
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

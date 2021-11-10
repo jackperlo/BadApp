@@ -1,10 +1,12 @@
 package com.example.progettoium.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.progettoium.utils.NetworkViewModel;
@@ -64,7 +66,20 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        ProgressDialog progressDialog = new ProgressDialog(this);
         model.testServerConnection("0");
+        progressDialog.setMessage("Connessione...");
+        progressDialog.show();
+        model.getIsConnected().observe(this, connected -> {
+            if(connected) {
+                progressDialog.dismiss();
+                model.fetchBookedRepetitions();
+            } else {
+                progressDialog.setMessage("Connessione al server...");
+                progressDialog.show();
+                model.testServerConnection("5000");
+            }
+        });
 
         //model.checkSession();
         //TODO: renderlo invisibile solo se non è loggato. Da fare dopo la check session

@@ -24,22 +24,6 @@
         app:cardElevation="15dp">
 
 
-        <ImageView
-            android:id="@+id/imgNoConnection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/no_connection"
-            android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/txtNoConnection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="LA CONNESSIONE AL SERVER NON E' RIUSITA, RIPROVO..."
-            android:textColorLink="@color/MAIN_COLOR"
-            android:textSize="24sp"
-            android:visibility="invisible" />
-
         <LinearLayout
             android:id="@+id/linearLayoutBooking"
             android:layout_width="match_parent"

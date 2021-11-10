@@ -1,6 +1,7 @@
 package com.example.progettoium.utils;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.progettoium.data.BookedRepetitions;
 import com.example.progettoium.data.User;
@@ -117,7 +119,6 @@ public class NetworkViewModel extends AndroidViewModel {
                 if (isDone)
                     usersData.updateUser(new User(json.getString("account"), json.getString("pwd"), json.getString("role"), json.getString("name"), json.getString("surname"))); // aggiorna i live data
                 else {
-                    isConnected.updateConnection(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -143,7 +144,6 @@ public class NetworkViewModel extends AndroidViewModel {
                 if (isDone)
                     usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
                 else {
-                    isConnected.updateConnection(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -213,7 +213,7 @@ public class NetworkViewModel extends AndroidViewModel {
                     }
                     bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
                 } else {
-                    isConnected.updateConnection(false);
+                    Toast.makeText(getApplication().getApplicationContext(), jsonResult.getString("error"), Toast.LENGTH_LONG).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -263,7 +263,8 @@ public class NetworkViewModel extends AndroidViewModel {
                     }
                     bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
                 } else {
-                    isConnected.updateConnection(false);
+                    //TODO: se il server è giù all'inizio l'app sembra crashare
+                    Toast.makeText(getApplication().getApplicationContext(), jsonResult.getString("error"), Toast.LENGTH_LONG).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -287,7 +288,7 @@ public class NetworkViewModel extends AndroidViewModel {
         try {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(5000 /* milliseconds */);
+            conn.setReadTimeout(15000 /* milliseconds */);
             conn.setConnectTimeout(2000 /* milliseconds */);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
@@ -335,7 +336,7 @@ public class NetworkViewModel extends AndroidViewModel {
         try {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(5000 /* milliseconds */);
+            conn.setReadTimeout(15000 /* milliseconds */);
             conn.setConnectTimeout(2000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
