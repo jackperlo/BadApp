@@ -55,7 +55,7 @@ public class HomeFragment extends Fragment {
 
         networkViewModel.getIsConnected().observe(getViewLifecycleOwner(), connected -> {
             Log.d("NetworkWiewModel", "Observe " + connected);
-            if(connected.equals("connected"))
+            if(connected)
                 networkViewModel.fetchBookedRepetitions();
             else
                 networkViewModel.pollingTestServerConnection();

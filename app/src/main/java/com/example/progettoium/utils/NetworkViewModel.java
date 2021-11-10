@@ -3,6 +3,7 @@ package com.example.progettoium.utils;
 import android.app.ActivityOptions;
 import android.app.Application;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
@@ -76,7 +77,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public boolean checkSession() {
         boolean isDone = false;
 
-        if (getIsConnected().getValue().equals("connected")) {
+        if (getIsConnected().getValue()) {
             JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
 
             try {
@@ -98,7 +99,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public boolean registerUser(String account, String password, String name, String surname) {
         boolean isDone = false;
 
-        if (getIsConnected().getValue().equals("connected")) {
+        if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
@@ -113,7 +114,7 @@ public class NetworkViewModel extends AndroidViewModel {
                 if (isDone)
                     usersData.updateUser(new User(json.getString("account"), json.getString("pwd"), json.getString("role"), json.getString("name"), json.getString("surname"))); // aggiorna i live data
                 else {
-                    isConnected.updateConnection("no_connection");
+                    isConnected.updateConnection(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -126,7 +127,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public boolean loginUser(String account, String password) {
         boolean isDone = false;
 
-        if (getIsConnected().getValue().equals("connected")) {
+        if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
@@ -139,7 +140,7 @@ public class NetworkViewModel extends AndroidViewModel {
                 if (isDone)
                     usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
                 else {
-                    isConnected.updateConnection("no_connection");
+                    isConnected.updateConnection(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -151,30 +152,20 @@ public class NetworkViewModel extends AndroidViewModel {
 
     public void testServerConnection() {
         //TODO: creare servlet
-        launchThreadNotBlocking(myURLs.getServerUrlCheckSession());
+        new ThreadAsync().execute(myURLs.getServerUrlCheckSession());
     }
 
     public void pollingTestServerConnection() {
-        boolean value = getIsConnected().getValue().equals("connected");
-        int count = 0;
-        while (!value) {
-            isConnected.updateConnection("connected");
-            value = getIsConnected().getValue().equals("connected");
-            Log.d("Network", "Riconnessione.. " + value);
-            /*try {
-                Thread.sleep(5000);
-                testServerConnection();
-                value = getIsConnected().getValue().equals("connected");
-                count++;
+        testServerConnection();
 
-                if(count == 3)
-                    isConnected.updateConnection("connected");
+        if(!getIsConnected().getValue()) {
+            try {
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
-        }
-
-        if (getIsConnected().getValue().equals("connected"))
+            }
+            pollingTestServerConnection();
+        } else
             Log.d("Network", "CONNECTED");
     }
 
@@ -185,7 +176,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public boolean fetchBookedHistory() {
         boolean isDone = false;
 
-        if (getIsConnected().getValue().equals("connected")) {
+        if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<>();
 
             String state = "Active";
@@ -233,7 +224,7 @@ public class NetworkViewModel extends AndroidViewModel {
                     }
                     bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
                 } else {
-                    isConnected.updateConnection("no_connection");
+                    isConnected.updateConnection(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -246,7 +237,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public boolean fetchBookedRepetitions() {
         boolean isDone = false;
 
-        if (getIsConnected().getValue().equals("connected")) {
+        if (getIsConnected().getValue()) {
             JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST");
 
             // DATA FORMAT EXAMPLE
@@ -283,7 +274,7 @@ public class NetworkViewModel extends AndroidViewModel {
                     }
                     bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
                 } else {
-                    isConnected.updateConnection("no_connection");
+                    isConnected.updateConnection(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -421,19 +412,25 @@ public class NetworkViewModel extends AndroidViewModel {
         }
     }
 
-    public void launchThreadNotBlocking(String url) {
+    /*public void launchThreadNotBlocking(String url) {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                String retVal = sendPOSTRequest(url, new HashMap<>());
-                if (retVal.equals("no_connection"))
-                    isConnected.updateConnection(retVal);
-                else
-                    isConnected.updateConnection("connected");
-                Log.d("thread", "thread " + retVal);
             }
         };
 
         thread.start();
+    }*/
+
+    public class ThreadAsync extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            return sendPOSTRequest(strings[0], new HashMap<>());
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            isConnected.setValue(!s.equals("no_connection"));
+        }
     }
 }
