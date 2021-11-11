@@ -13,6 +13,5 @@ import com.example.progettoium.data.User;
 public class ConnectionLiveData extends MutableLiveData<Boolean> {
     public void updateConnection(Boolean result) {
         postValue(result); // Notifica tutti i listener
-        Log.d("updateConnetion", "Post Value " + result);
     }
 }

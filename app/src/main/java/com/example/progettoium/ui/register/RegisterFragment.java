@@ -1,5 +1,6 @@
 package com.example.progettoium.ui.register;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,19 +32,20 @@ public class RegisterFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
-        networkViewModel.testServerConnection("0");
+        //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Connessione...");
+        progressDialog.show();
+        networkViewModel.testServerConnection("0", "check_connection_server");
 
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateSurname(binding.surname) && validateName(binding.name) && validateEmail(binding.email) && validatePassword(binding.password)) {
+                if (validateSurname(binding.surname) && validateName(binding.name) && validateEmail(binding.email) && validatePassword(binding.password)) {
                     String password = binding.password.getText().toString();
-                    if(valideteRetypePassword(binding.retypePassword, password)) {
-                        binding.loading.setVisibility(View.VISIBLE);
-
+                    if (valideteRetypePassword(binding.retypePassword, password)) {
                         // N.B. Gli Admin vanno aggiunti direttamente dal phpmyadmin!
                         //QUI TUTTE LE REGISTRAZIONI SONO DI ROLE 'CLIENT'
-
                         if (networkViewModel.registerUser(binding.email.getText().toString(), password, binding.name.getText().toString(), binding.surname.getText().toString())) {
                             NavHostFragment.findNavController(RegisterFragment.this)
                                     .navigate(R.id.action_nav_register_to_nav_home);
@@ -61,7 +63,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateSurname(EditText surname) {
         String val = surname.getText().toString();
-        if(val.isEmpty()) {
+        if (val.isEmpty()) {
             surname.setError("Field cannot be empty");
             return false;
         } else {
@@ -73,7 +75,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateName(EditText name) {
         String val = name.getText().toString();
-        if(val.isEmpty()) {
+        if (val.isEmpty()) {
             name.setError("Field cannot be empty");
             return false;
         } else {
@@ -118,7 +120,7 @@ public class RegisterFragment extends Fragment {
     private boolean valideteRetypePassword(EditText retypePassword, String password) {
         String val = retypePassword.getText().toString();
 
-        if(!val.equals(password)){
+        if (!val.equals(password)) {
             retypePassword.setError("Password must be equals");
             return false;
         } else {

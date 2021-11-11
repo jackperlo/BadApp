@@ -57,8 +57,6 @@ public class NetworkViewModel extends AndroidViewModel {
     public NetworkViewModel(Application application) {
         super(application);
 
-        Log.d("Costruttore", "costruttore");
-
         usersData = new UserLiveData();
         bookedRepetitionsData = new BookedRepetitionsLiveData();
         isConnected = new ConnectionLiveData();
@@ -153,9 +151,8 @@ public class NetworkViewModel extends AndroidViewModel {
         return isDone;
     }
 
-    public void testServerConnection(String timeout) {
-        //TODO: creare servlet
-        new CheckConnectionAsync().execute(myURLs.getServerUrlCheckSession(), timeout);
+    public void testServerConnection(String timeout, String type) {
+        new CheckConnectionAsync().execute(myURLs.getServerUrlCheckSession(), timeout, type);
     }
 
     public void setSelectedHistoryTab(int selectedHistoryTab) {
@@ -289,7 +286,7 @@ public class NetworkViewModel extends AndroidViewModel {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000 /* milliseconds */);
-            conn.setConnectTimeout(2000 /* milliseconds */);
+            conn.setConnectTimeout(8000 /* milliseconds */);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -337,7 +334,7 @@ public class NetworkViewModel extends AndroidViewModel {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000 /* milliseconds */);
-            conn.setConnectTimeout(2000 /* milliseconds */);
+            conn.setConnectTimeout(8000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 
@@ -411,12 +408,15 @@ public class NetworkViewModel extends AndroidViewModel {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return sendPOSTRequest(strings[0], new HashMap<>());
+
+            HashMap<String, String> param = new HashMap<>();
+            param.put("type", strings[2]);
+            return sendGETRequest(strings[0], param);
         }
 
         @Override
         protected void onPostExecute(String s) {
-            isConnected.setValue(!s.equals("no_connection"));
+            isConnected.setValue(!(s.equals("no_connection") || s.equals("no_connection\n"))); //Il server risponde con un \n alla fine
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.progettoium.ui.login;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -34,7 +35,7 @@ public class LoginFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
-        networkViewModel.testServerConnection("0");
+        networkViewModel.testServerConnection("0", "check_connection_server");
 
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +49,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (validateEmail(binding.email) && validatePassword(binding.password)) {
+                    //TODO: se la connessione non c'è quando si preme il tasto login, si bugga
                     if (networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())) {
                         NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                         navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);

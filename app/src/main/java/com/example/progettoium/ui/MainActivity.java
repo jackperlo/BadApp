@@ -66,18 +66,20 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        //mainActivityBinding.loading.setVisibility(View.VISIBLE);
         ProgressDialog progressDialog = new ProgressDialog(this);
-        model.testServerConnection("0");
         progressDialog.setMessage("Connessione...");
         progressDialog.show();
+        model.testServerConnection("0", "check_connection_server");
         model.getIsConnected().observe(this, connected -> {
             if(connected) {
                 progressDialog.dismiss();
+                //mainActivityBinding.loading.setVisibility(View.INVISIBLE);
                 model.fetchBookedRepetitions();
             } else {
-                progressDialog.setMessage("Connessione al server...");
                 progressDialog.show();
-                model.testServerConnection("5000");
+                //mainActivityBinding.loading.setVisibility(View.VISIBLE);
+                model.testServerConnection("5000", "check_connection_server");
             }
         });
 

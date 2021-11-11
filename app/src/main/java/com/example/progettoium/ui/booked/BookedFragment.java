@@ -1,5 +1,6 @@
 package com.example.progettoium.ui.booked;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,11 @@ public class BookedFragment extends Fragment {
         adapter = new BookedHistoryCustomViewAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
+        //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Connessione...");
+        progressDialog.show();
+        networkViewModel.testServerConnection("0", "check_connection_server");
         networkViewModel.fetchBookedHistory();
 
         TabLayout tabLayout = binding.tabLayout;
