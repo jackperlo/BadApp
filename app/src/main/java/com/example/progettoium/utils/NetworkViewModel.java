@@ -137,6 +137,7 @@ public class NetworkViewModel extends AndroidViewModel {
                 state = "Done";
 
             items.put("state", state);
+            items.put("account", usersData.getValue().getAccount());
             launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
         }
     }
@@ -317,7 +318,7 @@ public class NetworkViewModel extends AndroidViewModel {
                             JSONArray jsonArray = json.get().getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); ++i) {
                                 JSONObject jsonItem = jsonArray.getJSONObject(i);
-                                BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                                BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"));
                                 bookedRepetitions.add(item);
                             }
                             bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);

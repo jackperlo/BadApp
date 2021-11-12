@@ -42,8 +42,8 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             int endTime = Integer.parseInt(temp[0]) + 1;
             holder.lbl_CourseEndTime.setText("" + endTime + ":00");
 
-            holder.lbl_TeacherDisplayer.setText(String.valueOf(course.getIDTeacher()));
-            holder.lbl_CourseDisplayer.setText(String.valueOf(course.getIDCourse()));
+            holder.lbl_TeacherDisplayer.setText(String.valueOf(course.getTitle()));
+            holder.lbl_CourseDisplayer.setText(String.valueOf(course.getSurname() + " " + course.getName()));
         }
     }
 
@@ -115,7 +115,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return ((oldPosts.get(oldItemPosition).getDay() == newPosts.get(newItemPosition).getDay()) && (oldPosts.get(oldItemPosition).getStartTime() == newPosts.get(newItemPosition).getStartTime()) && (oldPosts.get(oldItemPosition).getIDCourse() == newPosts.get(newItemPosition).getIDCourse()) && (oldPosts.get(oldItemPosition).getIDTeacher() == newPosts.get(newItemPosition).getIDTeacher()));
+            return ((oldPosts.get(oldItemPosition).getDay() == newPosts.get(newItemPosition).getDay()) && (oldPosts.get(oldItemPosition).getStartTime() == newPosts.get(newItemPosition).getStartTime()) && (oldPosts.get(oldItemPosition).getTitle() == newPosts.get(newItemPosition).getTitle()) && (oldPosts.get(oldItemPosition).getSurname() == newPosts.get(newItemPosition).getSurname()) && (oldPosts.get(oldItemPosition).getName() == newPosts.get(newItemPosition).getName()));
         }
 
         @Override

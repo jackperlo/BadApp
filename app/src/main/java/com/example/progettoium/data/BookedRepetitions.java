@@ -3,14 +3,16 @@ package com.example.progettoium.data;
 public class BookedRepetitions {
     String day;
     String startTime;
-    int IDCourse;
-    int IDTeacher;
+    String title;
+    String surname;
+    String name;
 
-    public BookedRepetitions(String day, String startTime, int IDCourse, int IDTeacher) {
+    public BookedRepetitions(String day, String startTime, String title, String surname, String name) {
         this.day = day;
         this.startTime = startTime;
-        this.IDCourse = IDCourse;
-        this.IDTeacher = IDTeacher;
+        this.title = title;
+        this.surname = surname;
+        this.name = name;
     }
 
     public String getDay() {
@@ -21,11 +23,15 @@ public class BookedRepetitions {
         return startTime;
     }
 
-    public int getIDCourse() {
-        return IDCourse;
+    public String getTitle() {
+        return title;
     }
 
-    public int getIDTeacher() {
-        return IDTeacher;
+    public String getSurname() {
+        return surname;
+    }
+
+    public String getName() {
+        return name;
     }
 }

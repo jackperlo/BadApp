@@ -50,9 +50,9 @@
     <string name="select_course">Select Course</string>
 
     <!--Booked Repetitions-->
-    <string name="le_mie_prenotazioni">Le mie Prenotazioni</string>
-    <string name="indietro">INDIETRO</string>
-    <string name="attive">Attive</string>
-    <string name="cancellate">Cancellate</string>
-    <string name="seguite">Seguite</string>
+    <string name="my_reservations">My Reservations</string>
+    <string name="active">Active</string>
+    <string name="deleted">Deleted</string>
+    <string name="done">Done</string>
+    <string name="back">Back</string>
 </resources>
