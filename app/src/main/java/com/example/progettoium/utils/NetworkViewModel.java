@@ -3,7 +3,9 @@ package com.example.progettoium.utils;
 import android.app.Application;
 import android.util.Log;
 
-import com.example.progettoium.data.BookedRepetitions;
+import com.example.progettoium.data.Courses;
+import com.example.progettoium.data.FreeRepetitions;
+import com.example.progettoium.data.Teachers;
 import com.example.progettoium.data.User;
 import com.google.gson.JsonObject;
 
@@ -35,19 +37,19 @@ import java.util.concurrent.atomic.AtomicReference;
 */
 public class NetworkViewModel extends AndroidViewModel{
     private final UserLiveData usersData;
-    private final BookedRepetitionsLiveData bookedRepetitionsData;
+    private final FreeRepetitionsLiveData freeRepetitionsData;
 
     public NetworkViewModel(Application application) {
         super(application);
 
         usersData = new UserLiveData();
-        bookedRepetitionsData = new BookedRepetitionsLiveData();
+        freeRepetitionsData = new FreeRepetitionsLiveData();
     }
 
     /*GETTING DATA FROM LIVE DATA ALREADY FILLED UP FROM DB QUERIES*/
     public UserLiveData getRegisteredUser() { return usersData; }
 
-    public BookedRepetitionsLiveData getBookedRepetitions(){ return bookedRepetitionsData; }
+    public FreeRepetitionsLiveData getFreeRepetitions(){ return freeRepetitionsData; }
     /*END GETTING DATA FROM LIVE DATA*/
 
     /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
@@ -112,28 +114,58 @@ public class NetworkViewModel extends AndroidViewModel{
         return isDone;
     }
 
-    public boolean fetchBookedRepetitions(){
-        JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST");
+    public boolean fetchFreeRepetitions(String day){
+        HashMap<String, String> items = new HashMap<>();
+        items.put("day", day);
+        JSONObject jsonResult = launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST");
 
         // DATA FORMAT EXAMPLE
         /*
-        * JSONObject myJSON = {
-        *   done : true,
-        *   results : [
-        *               {
-        *                day:monday,
-        *                startTime:15:00,
-        *                IDCourse:5,
-        *                IDTeacher:3
-        *               },
-        *               {
-         *               day:tuesday,
-         *               startTime:17:00,
-         *               IDCourse:3,
-         *               IDTeacher:1
-         *              }
-        *             ]
-        * }
+        JSONObject myJSON =
+         {
+           done : true,
+           results : [
+                   {
+                     day:monday,
+                     startTime:15:00,
+                     coursesList:[
+                                   {
+                                       Title: Prog III,
+                                       IDCourse: 5,
+                                       teachersList:[
+                                            {
+                                                Surname: Esposito,
+                                                Name: Roberto,
+                                                IDTeacher: 1
+                                            },
+                                            {
+                                                 Surname: Aringhieri,
+                                                 Name: Roberto,
+                                                 IDTeacher:  6
+                                            }
+                                       ]
+                                   },
+                                   {
+                                       Title: IUM,
+                                       IDCourse: 8,
+                                       teachersList:[
+                                            {
+                                                Surname: Esposito,
+                                                Name: Roberto,
+                                                IDTeacher: 1
+                                            }
+                                       ]
+                                   },
+                                   {....}
+                    ]
+                  },
+                  {
+                    day:monday,
+                    startTime:16:00,
+                    courseList:[...]
+                  }
+               ]
+          }
         * */
 
         boolean isDone = false;
@@ -142,14 +174,31 @@ public class NetworkViewModel extends AndroidViewModel{
             isDone = jsonResult.getBoolean("done");
 
             if(isDone) {
-                ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
+                ArrayList<FreeRepetitions> freeRepetitions = new ArrayList<FreeRepetitions>();
+                ArrayList<Courses> courses = null;
+                ArrayList<Teachers> teachers = null;
+
                 JSONArray jsonArray = jsonResult.getJSONArray("results");
-                for (int i = 0; i < jsonArray.length(); ++i) {
+                for (int i = 0; i < jsonArray.length(); ++i) { //for every hour of that day
                     JSONObject jsonItem = jsonArray.getJSONObject(i);
-                    BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
-                    bookedRepetitions.add(item);
+                    JSONArray coursesList = jsonItem.getJSONArray("coursesList");
+                    courses = new ArrayList<>();
+                    for (int j = 0; j < coursesList.length(); ++j){ //for every available course
+                        JSONObject courseItem = coursesList.getJSONObject(j);
+                        JSONArray teachersList = courseItem.getJSONArray("teachersList");
+                        teachers = new ArrayList<>();
+                        for (int k = 0; k < teachersList.length(); ++k){ //for every teacher available to do repetition for that course at that time
+                            JSONObject teacherItem = teachersList.getJSONObject(k);
+                            Teachers teacher = new Teachers(teacherItem.getInt("IDTeacher"), teacherItem.getString("Name"), teacherItem.getString("Surname"));
+                            teachers.add(teacher);
+                        }
+                        Courses course = new Courses(courseItem.getInt("IDCourse"), courseItem.getString("Title"), teachers);
+                        courses.add(course);
+                    }
+                    FreeRepetitions item = new FreeRepetitions(day, jsonItem.getString("startTime"), courses);
+                    freeRepetitions.add(item);
                 }
-                bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                freeRepetitionsData.updateFreeRepetitions(freeRepetitions);
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,15 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.progettoium.R;
-import com.example.progettoium.data.BookedRepetitions;
+import com.example.progettoium.data.Courses;
+import com.example.progettoium.data.FreeRepetitions;
+import com.example.progettoium.data.Teach;
+import com.example.progettoium.data.Teachers;
 
 public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<BookedRepetitionsCustomViewAdapter.ViewHolder> {
 
-    private List<BookedRepetitions> mData;
+    private List<FreeRepetitions> mData;
     private LayoutInflater mInflater;
+    private String jolly1 = "";
+    private String jolly2 = "";
 
     // data is passed into the constructor
-    public BookedRepetitionsCustomViewAdapter(Context context, List<BookedRepetitions> data) {
+    public BookedRepetitionsCustomViewAdapter(Context context, List<FreeRepetitions> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -39,28 +45,28 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
-    //TODO: PER OGNI ROW METTO TUTTO, ESCLUDO LE ROW CHE SONO NEI LIVEDATA E QUINDI SONO GIA PRENOTATE
+    // binds the data in the recycler view for each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        BookedRepetitions course = mData.get(position);
-        holder.lbl_CourseStartTime.setText(""+course.getStartTime());
-        String [] temp = course.getStartTime().split(":");
+        FreeRepetitions repetition = mData.get(position);
+        holder.lbl_CourseStartTime.setText(""+repetition.getStartTime());
+        String [] temp = repetition.getStartTime().split(":");
         int endTime = Integer.parseInt(temp[0]) + 1;
         holder.lbl_CourseEndTime.setText(""+endTime+":00");
 
-        // Spinner Drop down elements
-        List<String> categories = new ArrayList<String>();
-        categories.add("Item 1");
-        categories.add("Item 2");
-        categories.add("Item 3");
-        categories.add("Item 4");
-        categories.add("Item 5");
-        categories.add("Item 6");
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(mInflater.getContext(), android.R.layout.simple_spinner_item, categories);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        holder.spinner_CoursesDisplayer.setAdapter(dataAdapter);
-        holder.spinner_TeachersDisplayer.setAdapter(dataAdapter);
+        ArrayList<Courses> courseList = repetition.getCoursesList();
+        jolly1 = mInflater.getContext().getResources().getString(R.string.select_course);
+        jolly2 = mInflater.getContext().getResources().getString(R.string.select_teacher);
+        Courses jollyCourse = new Courses(-1, String.valueOf(jolly1));
+        courseList.add(0, jollyCourse);
+        ArrayAdapter<Courses> courseSpinnerAdapter = new ArrayAdapter<Courses>(mInflater.getContext(), android.R.layout.simple_spinner_item, courseList);
+        courseSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        holder.spinner_CoursesDisplayer.setAdapter(courseSpinnerAdapter);
+        holder.spinner_CoursesDisplayer.setSelection(courseSpinnerAdapter.getPosition(jollyCourse));
+
+        holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
+
+        holder.btn_bookLesson.setEnabled(false);
     }
 
     // total number of rows
@@ -82,9 +88,9 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
             lbl_CourseStartTime = itemView.findViewById(R.id.lbl_CourseStartTime);
             lbl_CourseEndTime = itemView.findViewById(R.id.lbl_CourseEndTime);
             spinner_CoursesDisplayer = itemView.findViewById(R.id.spinner_Courses);
-            spinner_CoursesDisplayer.setOnItemSelectedListener(this);
+            spinner_CoursesDisplayer.setOnItemSelectedListener(onItemSeletctedCourseSpinner);
             spinner_TeachersDisplayer = itemView.findViewById(R.id.spinner_Teachers);
-            spinner_TeachersDisplayer.setOnItemSelectedListener(this);
+            spinner_TeachersDisplayer.setOnItemSelectedListener(onItemSeletctedTeacherSpinner);
             btn_bookLesson = itemView.findViewById(R.id.btn_bookLesson);
             btn_bookLesson.setOnClickListener(this);
         }
@@ -94,20 +100,60 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
             Toast.makeText(view.getContext(),"CLICK: "+getAdapterPosition(),Toast.LENGTH_LONG).show();
         }
 
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            String item = parent.getItemAtPosition(position).toString();
-            Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_SHORT).show();
+        AdapterView.OnItemSelectedListener onItemSeletctedCourseSpinner = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Courses course = (Courses) parent.getSelectedItem();
 
+                if(course.getIDCourse() != -1){
+                    Teachers jollyTeacher = new Teachers(-1, jolly2, "");
+                    ArrayList<Teachers> teachersList = course.getTeachersList();
+                    teachersList.add(0, jollyTeacher);
+                    ArrayAdapter<Teachers> teacherSpinnerAdapter = new ArrayAdapter<Teachers>(mInflater.getContext(), android.R.layout.simple_spinner_item, teachersList);
+                    teacherSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner_TeachersDisplayer.setAdapter(teacherSpinnerAdapter);
+                    spinner_TeachersDisplayer.setSelection(teacherSpinnerAdapter.getPosition(jollyTeacher));
+
+                    if(spinner_TeachersDisplayer.getVisibility() == View.GONE)
+                        spinner_TeachersDisplayer.setVisibility(View.VISIBLE);
+                }else{
+                    if(spinner_TeachersDisplayer.getVisibility() == View.VISIBLE)
+                        spinner_TeachersDisplayer.setVisibility(View.GONE);
+                }
+
+                //Toast.makeText(mInflater.getContext(), "Course ID: "+course.getIDCourse()+", Title : "+course.getTitle(), Toast.LENGTH_SHORT).show();
+
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // Auto-generated method stub for course spinner
+            }
+        };
+
+        AdapterView.OnItemSelectedListener onItemSeletctedTeacherSpinner = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Teachers teacher = (Teachers) parent.getSelectedItem();
+                //Toast.makeText(mInflater.getContext(), "Teacher ID: "+teacher.getIDTeacher()+", Teacher : "+teacher.getFullName(), Toast.LENGTH_SHORT).show();
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // Auto-generated method stub for teacher spinner
+            }
+        };
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            // Auto-generated method stub for viewHoler
         }
 
-        public void onNothingSelected(AdapterView<?> arg0) {
-            // TODO Auto-generated method stub
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            // Auto-generated method stub for viewHoler
         }
     }
 
-    public void setData(List<BookedRepetitions> newData) {
-
+    public void setData(List<FreeRepetitions> newData) {
         // Versione vecchia:  notifyDataSetChanged(); aggiorna TUTTA la lista
         if (mData != null) {
             PostDiffCallback postDiffCallback = new PostDiffCallback(mData, newData);
@@ -123,9 +169,9 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
 
     class PostDiffCallback extends DiffUtil.Callback {
 
-        private final List<BookedRepetitions> oldPosts, newPosts;
+        private final List<FreeRepetitions> oldPosts, newPosts;
 
-        public PostDiffCallback(List<BookedRepetitions> oldPosts, List<BookedRepetitions> newPosts) {
+        public PostDiffCallback(List<FreeRepetitions> oldPosts, List<FreeRepetitions> newPosts) {
             this.oldPosts = oldPosts;
             this.newPosts = newPosts;
         }
@@ -142,7 +188,7 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return ((oldPosts.get(oldItemPosition).getDay() == newPosts.get(newItemPosition).getDay()) && (oldPosts.get(oldItemPosition).getStartTime() == newPosts.get(newItemPosition).getStartTime()) && (oldPosts.get(oldItemPosition).getIDCourse() == newPosts.get(newItemPosition).getIDCourse()) && (oldPosts.get(oldItemPosition).getIDTeacher() == newPosts.get(newItemPosition).getIDTeacher()));
+            return ((oldPosts.get(oldItemPosition).getDay() == newPosts.get(newItemPosition).getDay()) && (oldPosts.get(oldItemPosition).getStartTime() == newPosts.get(newItemPosition).getStartTime()));
         }
 
         @Override

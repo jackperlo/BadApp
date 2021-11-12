@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 public class HomeFragment extends Fragment {
 
     private NetworkViewModel networkViewModel;
-    //CoursesTimeTableLiveData coursesViewModel;
     private FragmentHomeBinding binding;
 
     BookedRepetitionsCustomViewAdapter adapter;
@@ -32,20 +32,19 @@ public class HomeFragment extends Fragment {
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+
         View root = binding.getRoot();
 
         RecyclerView recyclerView = binding.coursesList;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList());
         recyclerView.setAdapter(adapter);
-        networkViewModel.fetchBookedRepetitions();
 
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                String aus = ""+tab.getPosition();
-                Toast.makeText(getContext(),aus, Toast.LENGTH_SHORT).show();
+                networkViewModel.fetchFreeRepetitions(getWeekDay(tab.getPosition()));
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
@@ -53,6 +52,7 @@ public class HomeFragment extends Fragment {
             public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        networkViewModel.fetchFreeRepetitions(getWeekDay(tabLayout.getSelectedTabPosition()));
         return root;
     }
 
@@ -61,11 +61,11 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
-        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), ite -> {
-            binding.lblWelcomeMainFragment.setText("Hi, " + ite.getName() + " " +ite.getSurname());
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " +user.getSurname());
         });
-        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            adapter.setData(courseObjects);  // setta i dati nella recyclerView
+        networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), repetitions -> {
+            adapter.setData(repetitions);  // setta i dati nella recyclerView
         });
 
     }
@@ -74,5 +74,29 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private String getWeekDay(int tabValue){
+        String ret = "";
+        switch (tabValue){
+            case 0:
+                ret = "Monday";
+                break;
+            case 1:
+                ret = "Tuesday";
+                break;
+            case 2:
+                ret = "Wednesday";
+                break;
+            case 3:
+                ret = "Thurday";
+                break;
+            case 4:
+                ret = "Friday";
+                break;
+            default:
+                break;
+        }
+        return ret;
     }
 }
