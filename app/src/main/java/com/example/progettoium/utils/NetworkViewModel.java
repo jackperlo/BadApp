@@ -1,23 +1,14 @@
 package com.example.progettoium.utils;
 
-import android.app.ActivityOptions;
-import android.app.AlertDialog;
 import android.app.Application;
-import android.app.Service;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.progettoium.data.BookedRepetitions;
 import com.example.progettoium.data.User;
-import com.example.progettoium.ui.MainActivity;
-import com.example.progettoium.ui.SplashScreen;
 import com.google.gson.JsonObject;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 
 import org.json.JSONArray;
@@ -29,19 +20,14 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectStreamException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -77,7 +63,7 @@ public class NetworkViewModel extends AndroidViewModel {
     /*END GETTING DATA FROM LIVE DATA*/
 
     /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
-    public boolean checkSession() {
+    /*public boolean checkSession() {
         boolean isDone = false;
 
         if (getIsConnected().getValue()) {
@@ -97,11 +83,9 @@ public class NetworkViewModel extends AndroidViewModel {
         }
 
         return isDone;
-    }
+    }*/
 
-    public boolean registerUser(String account, String password, String name, String surname) {
-        boolean isDone = false;
-
+    public void registerUser(String account, String password, String name, String surname) {
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
@@ -109,46 +93,18 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("name", name);
             items.put("surname", surname);
 
-            JSONObject json = launchThread(myURLs.getServerUrlRegistration(), items, "POST");
-
-            try {
-                isDone = json.getBoolean("done");
-
-                if (isDone)
-                    usersData.updateUser(new User(json.getString("account"), json.getString("pwd"), json.getString("role"), json.getString("name"), json.getString("surname"))); // aggiorna i live data
-                else {
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            launchThread(myURLs.getServerUrlRegistration(), items, "POST", "registration");
         }
-
-        return isDone;
     }
 
-    public boolean loginUser(String account, String password) {
-        boolean isDone = false;
-
+    public void loginUser(String account, String password) {
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
 
-            JSONObject json = launchThread(myURLs.getServerUrlLogin(), items, "POST");
-
-            try {
-                isDone = json.getBoolean("done");
-
-                if (isDone)
-                    usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
-                else {
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            launchThread(myURLs.getServerUrlLogin(), items, "POST", "login");
         }
-
-        return isDone;
     }
 
     public void testServerConnection(String timeout, String type) {
@@ -159,9 +115,7 @@ public class NetworkViewModel extends AndroidViewModel {
         this.selectedHistoryTab = selectedHistoryTab;
     }
 
-    public boolean fetchBookedHistory() {
-        boolean isDone = false;
-
+    public void fetchBookedHistory() {
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<>();
 
@@ -174,101 +128,14 @@ public class NetworkViewModel extends AndroidViewModel {
                 state = "Done";
 
             items.put("state", state);
-            JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST");
-
-            // DATA FORMAT EXAMPLE
-            /*
-             * JSONObject myJSON = {
-             *   done : true,
-             *   results : [
-             *               {
-             *                day:monday,
-             *                startTime:15:00,
-             *                IDCourse:5,
-             *                IDTeacher:3
-             *               },
-             *               {
-             *               day:tuesday,
-             *               startTime:17:00,
-             *               IDCourse:3,
-             *               IDTeacher:1
-             *              }
-             *             ]
-             * }
-             * */
-
-            try {
-                isDone = jsonResult.getBoolean("done");
-
-                if (isDone) {
-                    ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
-                    JSONArray jsonArray = jsonResult.getJSONArray("results");
-                    for (int i = 0; i < jsonArray.length(); ++i) {
-                        JSONObject jsonItem = jsonArray.getJSONObject(i);
-                        BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
-                        bookedRepetitions.add(item);
-                    }
-                    bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
-                } else {
-                    Toast.makeText(getApplication().getApplicationContext(), jsonResult.getString("error"), Toast.LENGTH_LONG).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
         }
-
-        return isDone;
     }
 
-    public boolean fetchBookedRepetitions() {
-        boolean isDone = false;
-
+    public void fetchBookedRepetitions() {
         if (getIsConnected().getValue()) {
-            JSONObject jsonResult = launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST");
-
-            // DATA FORMAT EXAMPLE
-            /*
-             * JSONObject myJSON = {
-             *   done : true,
-             *   results : [
-             *               {
-             *                day:monday,
-             *                startTime:15:00,
-             *                IDCourse:5,
-             *                IDTeacher:3
-             *               },
-             *               {
-             *               day:tuesday,
-             *                startTime:17:00,
-             *               IDCourse:3,
-             *               IDTeacher:1
-             *              }
-             *             ]
-             * }
-             * */
-
-            try {
-                isDone = jsonResult.getBoolean("done");
-
-                if (isDone) {
-                    ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<>();
-                    JSONArray jsonArray = jsonResult.getJSONArray("results");
-                    for (int i = 0; i < jsonArray.length(); ++i) {
-                        JSONObject jsonItem = jsonArray.getJSONObject(i);
-                        BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
-                        bookedRepetitions.add(item);
-                    }
-                    bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
-                } else {
-                    //TODO: se il server è giù all'inizio l'app sembra crashare
-                    Toast.makeText(getApplication().getApplicationContext(), jsonResult.getString("error"), Toast.LENGTH_LONG).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            launchThread(myURLs.getServerUrlBookedRepetitions(), new HashMap<>(), "POST", "booking");
         }
-
-        return isDone;
     }
     /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
 
@@ -364,46 +231,102 @@ public class NetworkViewModel extends AndroidViewModel {
         return result.toString();
     }
 
-    public JSONObject launchThread(String url, HashMap<String, String> params, String type) {
-        AtomicReference<JSONObject> returnJson = new AtomicReference<>();
-        ExecutorService es = Executors.newSingleThreadExecutor();
-
-        List<Callable<Object>> asyncFunction = new ArrayList<>();
-        asyncFunction.add(Executors.callable(() -> {
+    public void launchThread(String url, HashMap<String, String> params, String connType, String service) {
+        AtomicReference<JSONObject> json = new AtomicReference<>();
+        Executor e = Executors.newSingleThreadExecutor();
+        e.execute(() -> {
             String val;
-            if (type.equals("GET"))
+            if (connType.equals("GET"))
                 val = sendGETRequest(url, params);
-            else if (type.equals("POST"))
+            else if (connType.equals("POST"))
                 val = sendPOSTRequest(url, params);
             else
                 val = null;
-
+            //TODO: quando si entra nella pagina di login arrviano dei dati dal server sulle prenotazioni
+            //TODO: dividere i live data delle booking e delle booked perchè quando si passa della booked alle booking rimangono visualizzate quelle booked
             try {
                 if (val.equals("no_connection")) {
-                    returnJson.set(new JSONObject("{'no_connection':true, 'done':false}"));
-                } else
-                    returnJson.set(new JSONObject(val));
+                    if (service.equals("login") || service.equals("registration"))
+                        usersData.updateUser(null);
+                    else if (service.equals("booking") || service.equals("booked")) {
+                        bookedRepetitionsData.updateBookedRepetitions(null);
+                    }
+
+                    isConnected.setValue(false);
+                } else {
+                    json.set(new JSONObject(val));
+                    boolean isDone = json.get().getBoolean("done");
+
+                    if (service.equals("login") || service.equals("registration")) {
+                        if (isDone)
+                            if (service.equals("login"))
+                                usersData.updateUser(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
+                            else
+                                usersData.updateUser(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
+                        else
+                            usersData.updateUser(null);
+                    } else if (service.equals("booking")) {
+                        ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<>();
+                        if (isDone) {
+                            JSONArray jsonArray = json.get().getJSONArray("results");
+
+                            // DATA FORMAT EXAMPLE
+                            /*
+                             * JSONObject myJSON = {
+                             *   done : true,
+                             *   results : [
+                             *               {
+                             *                day:monday,
+                             *                startTime:15:00,
+                             *                IDCourse:5,
+                             *                IDTeacher:3
+                             *               },
+                             *               {
+                             *               day:tuesday,
+                             *                startTime:17:00,
+                             *               IDCourse:3,
+                             *               IDTeacher:1
+                             *              }
+                             *             ]
+                             * }
+                             * */
+
+                            for (int i = 0; i < jsonArray.length(); ++i) {
+                                JSONObject jsonItem = jsonArray.getJSONObject(i);
+                                BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                                bookedRepetitions.add(item);
+                            }
+                            bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), json.get().getString("error"), Toast.LENGTH_LONG).show();
+                            bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                        }
+                    } else if (service.equals("booked")) {
+                        ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
+                        if (isDone) {
+                            JSONArray jsonArray = json.get().getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); ++i) {
+                                JSONObject jsonItem = jsonArray.getJSONObject(i);
+                                BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getInt("IDCourse"), jsonItem.getInt("IDTeacher"));
+                                bookedRepetitions.add(item);
+                            }
+                            bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), json.get().getString("error"), Toast.LENGTH_LONG).show();
+                            bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                        }
+                    }
+                }
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        }));
-
-        try {
-            es.invokeAll(asyncFunction);
-            // istruzioni fatte dopo il richiamo
-            return returnJson.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-
-            return returnJson.get();
-        }
+        });
     }
 
     public class CheckConnectionAsync extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
             try {
-
                 Thread.sleep(Integer.parseInt(strings[1]));
             } catch (InterruptedException e) {
                 e.printStackTrace();

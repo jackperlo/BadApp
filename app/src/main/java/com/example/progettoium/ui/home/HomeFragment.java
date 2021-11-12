@@ -50,7 +50,8 @@ public class HomeFragment extends Fragment {
             binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
         });
         networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            adapter.setData(courseObjects);  // setta i dati nella recyclerView
+            if(courseObjects != null)
+                adapter.setData(courseObjects);  // setta i dati nella recyclerView
         });
 
         TabLayout tabLayout = binding.tabLayout;
@@ -67,6 +68,12 @@ public class HomeFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //TODO: ogni volta che si è sulla home bisogna aggiornare le prenotazioni disponibili
     }
 
     @Override

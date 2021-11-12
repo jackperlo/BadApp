@@ -16,6 +16,10 @@ public class User {
         this.surname = surname;
     }
 
+    public User() {
+
+    }
+
     //user used for Login
     public User(String account, String name, String surname) {
         this.account = account;

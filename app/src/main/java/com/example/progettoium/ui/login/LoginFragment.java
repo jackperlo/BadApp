@@ -45,21 +45,28 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Connessione...");
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            progressDialog.dismiss();
+            if(user == null) {
+                Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
+            } else {
+                NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
+
+                NavHostFragment.findNavController(LoginFragment.this)
+                        .navigate(R.id.action_nav_login_to_nav_home);
+            }
+        });
+
         binding.signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (validateEmail(binding.email) && validatePassword(binding.password)) {
-                    //TODO: se la connessione non c'è quando si preme il tasto login, si bugga
-                    if (networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())) {
-                        NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
-                        navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                        navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
-
-                        NavHostFragment.findNavController(LoginFragment.this)
-                                .navigate(R.id.action_nav_login_to_nav_home);
-                    } else {
-                        Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
-                    }
+                    progressDialog.show();
+                    networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString());
                 }
             }
         });

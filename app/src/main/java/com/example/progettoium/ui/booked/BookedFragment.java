@@ -45,11 +45,14 @@ public class BookedFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
-        ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Connessione...");
-        progressDialog.show();
-        networkViewModel.testServerConnection("0", "check_connection_server");
+        //TODO: controllare se cade la connessione cosa fare, oppure essere sicuri che la  connessione ci sia
         networkViewModel.fetchBookedHistory();
+        networkViewModel.testServerConnection("0", "check_connection_server");
+
+        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
+            if(courseObjects != null)
+                adapter.setData(courseObjects);
+        });
 
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -83,9 +86,6 @@ public class BookedFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            adapter.setData(courseObjects);
-        });
     }
 
     @Override

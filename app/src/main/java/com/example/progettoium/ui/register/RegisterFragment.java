@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentRegisterBinding;
+import com.google.android.material.navigation.NavigationView;
 
 public class RegisterFragment extends Fragment {
 
@@ -35,8 +36,20 @@ public class RegisterFragment extends Fragment {
         //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Connessione...");
-        progressDialog.show();
-        networkViewModel.testServerConnection("0", "check_connection_server");
+
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            progressDialog.dismiss();
+            if(user == null)
+                Toast.makeText(getContext(), "Registration failed! Try Again!", Toast.LENGTH_LONG).show();
+            else {
+                NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
+
+                NavHostFragment.findNavController(RegisterFragment.this)
+                        .navigate(R.id.action_nav_register_to_nav_home);
+            }
+        });
 
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,13 +59,8 @@ public class RegisterFragment extends Fragment {
                     if (valideteRetypePassword(binding.retypePassword, password)) {
                         // N.B. Gli Admin vanno aggiunti direttamente dal phpmyadmin!
                         //QUI TUTTE LE REGISTRAZIONI SONO DI ROLE 'CLIENT'
-                        if (networkViewModel.registerUser(binding.email.getText().toString(), password, binding.name.getText().toString(), binding.surname.getText().toString())) {
-                            NavHostFragment.findNavController(RegisterFragment.this)
-                                    .navigate(R.id.action_nav_register_to_nav_home);
-                        } else {
-                            binding.loading.setVisibility(View.INVISIBLE);
-                            Toast.makeText(getContext(), "Registration failed! Try Again!", Toast.LENGTH_LONG).show();
-                        }
+                        progressDialog.show();
+                        networkViewModel.registerUser(binding.email.getText().toString(), password, binding.name.getText().toString(), binding.surname.getText().toString());
                     }
                 }
             }

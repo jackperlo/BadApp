@@ -45,12 +45,14 @@ public class MainActivity extends AppCompatActivity {
         /*it must stay here because is shared between fragments (it's the side menu)*/
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
 
-        model.getRegisteredUser().observe(this, ite -> {
-            TextView txtNome = findViewById(R.id.txtNameSurname);
-            TextView txtMail = findViewById(R.id.txtMail);
+        model.getRegisteredUser().observe(this, account -> {
+            if(account != null) {
+                TextView txtNome = findViewById(R.id.txtNameSurname);
+                TextView txtMail = findViewById(R.id.txtMail);
 
-            txtNome.setText(ite.getName() + " " + ite.getSurname());
-            txtMail.setText(ite.getAccount());
+                txtNome.setText(account.getName() + " " + account.getSurname());
+                txtMail.setText(account.getAccount());
+            }
         });
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
