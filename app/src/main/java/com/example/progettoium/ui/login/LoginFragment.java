@@ -35,6 +35,7 @@ public class LoginFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
+        // TODO: necessario quello che segue?
         networkViewModel.testServerConnection("0", "check_connection_server");
 
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {

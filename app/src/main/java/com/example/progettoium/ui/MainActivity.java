@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.progettoium.databinding.FragmentHomeBinding;
+import com.example.progettoium.ui.home.HomeFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.google.android.material.navigation.NavigationView;
@@ -22,6 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.progettoium.databinding.ActivityMainBinding;
+import com.google.android.material.tabs.TabLayout;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -77,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
             if(connected) {
                 progressDialog.dismiss();
                 //mainActivityBinding.loading.setVisibility(View.INVISIBLE);
-                model.fetchBookedRepetitions();
+                int tabPosition = FragmentHomeBinding.inflate(getLayoutInflater()).tabLayout.getSelectedTabPosition();
+                model.fetchFreeRepetitions(getWeekDay(tabPosition));
             } else {
                 progressDialog.show();
                 //mainActivityBinding.loading.setVisibility(View.VISIBLE);
@@ -107,5 +111,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    private String getWeekDay(int tabValue){
+        String ret = "";
+        switch (tabValue){
+            case 0:
+                ret = "Monday";
+                break;
+            case 1:
+                ret = "Tuesday";
+                break;
+            case 2:
+                ret = "Wednesday";
+                break;
+            case 3:
+                ret = "Thurday";
+                break;
+            case 4:
+                ret = "Friday";
+                break;
+            default:
+                break;
+        }
+        return ret;
     }
 }

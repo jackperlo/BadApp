@@ -78,7 +78,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
-            // TODO Auto-generated method stub
+            //Auto-generated method stub
         }
     }
 

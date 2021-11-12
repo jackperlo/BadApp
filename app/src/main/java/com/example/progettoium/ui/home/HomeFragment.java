@@ -49,7 +49,7 @@ public class HomeFragment extends Fragment {
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
         });
-        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
+        networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             if(courseObjects != null)
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
         });
@@ -66,7 +66,6 @@ public class HomeFragment extends Fragment {
             public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        networkViewModel.fetchFreeRepetitions(getWeekDay(tabLayout.getSelectedTabPosition()));
         return root;
     }
 
@@ -109,5 +108,10 @@ public class HomeFragment extends Fragment {
                 break;
         }
         return ret;
+    }
+
+    public void fetchFreeRepetitions(){
+        TabLayout tabLayout = binding.tabLayout;
+        networkViewModel.fetchFreeRepetitions(getWeekDay(tabLayout.getSelectedTabPosition()));
     }
 }

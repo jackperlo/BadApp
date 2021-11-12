@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.progettoium.data.BookedRepetitions;
 import com.example.progettoium.data.Courses;
 import com.example.progettoium.data.FreeRepetitions;
 import com.example.progettoium.data.Teachers;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
@@ -138,7 +141,7 @@ public class NetworkViewModel extends AndroidViewModel {
         }
     }
 
-    public boolean fetchFreeRepetitions(String day){
+    public void fetchFreeRepetitions(String day){
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
         launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
@@ -150,10 +153,17 @@ public class NetworkViewModel extends AndroidViewModel {
     private String sendPOSTRequest(String urlServer, HashMap<String, String> params) {
         HttpURLConnection conn = null;
 
-        JsonObject jsonObject = new JsonObject();
+        String parameters = "";
+        int i=0;
         for (String itemKey : params.keySet()) {
-            jsonObject.addProperty(itemKey, params.get(itemKey));
+            if(i==0)
+                parameters += itemKey + "=" + params.get(itemKey);
+            else
+                parameters += "&" + itemKey + "=" + params.get(itemKey);
+            i++;
         }
+        byte[] postData = parameters.getBytes(StandardCharsets.UTF_8);
+        int postDataLength = postData.length;
 
         try {
             URL url = new URL(urlServer);
@@ -163,13 +173,13 @@ public class NetworkViewModel extends AndroidViewModel {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+            conn.setRequestProperty( "Content-Length", Integer.toString(postDataLength));
+            conn.setUseCaches(false);
             conn.setDoOutput(true);
 
-            try (OutputStream os = conn.getOutputStream()) {
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(String.valueOf(jsonObject));
-                writer.flush();
-                writer.close();
+            try(DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+                wr.write(postData);
+                wr.flush();
             }
 
             conn.connect();
@@ -295,7 +305,7 @@ public class NetworkViewModel extends AndroidViewModel {
                                     Courses course = new Courses(courseItem.getInt("IDCourse"), courseItem.getString("Title"), teachers);
                                     courses.add(course);
                                 }
-                                FreeRepetitions item = new FreeRepetitions(day, jsonItem.getString("startTime"), courses);
+                                FreeRepetitions item = new FreeRepetitions(params.get("day"), jsonItem.getString("startTime"), courses);
                                 freeRepetitions.add(item);
                             }
                             freeRepetitionsData.updateFreeRepetitions(freeRepetitions);

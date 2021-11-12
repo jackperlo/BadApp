@@ -29,8 +29,7 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
 
     private List<FreeRepetitions> mData;
     private LayoutInflater mInflater;
-    private String jolly1 = "";
-    private String jolly2 = "";
+    private Teachers jollyTeacher;
 
     // data is passed into the constructor
     public BookedRepetitionsCustomViewAdapter(Context context, List<FreeRepetitions> data) {
@@ -55,8 +54,7 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
         holder.lbl_CourseEndTime.setText(""+endTime+":00");
 
         ArrayList<Courses> courseList = repetition.getCoursesList();
-        jolly1 = mInflater.getContext().getResources().getString(R.string.select_course);
-        jolly2 = mInflater.getContext().getResources().getString(R.string.select_teacher);
+        String jolly1 = mInflater.getContext().getResources().getString(R.string.select_course);
         Courses jollyCourse = new Courses(-1, String.valueOf(jolly1));
         courseList.add(0, jollyCourse);
         ArrayAdapter<Courses> courseSpinnerAdapter = new ArrayAdapter<Courses>(mInflater.getContext(), android.R.layout.simple_spinner_item, courseList);
@@ -64,6 +62,9 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
         holder.spinner_CoursesDisplayer.setAdapter(courseSpinnerAdapter);
         holder.spinner_CoursesDisplayer.setSelection(courseSpinnerAdapter.getPosition(jollyCourse));
 
+        String jolly2 = mInflater.getContext().getResources().getString(R.string.select_teacher);
+
+        jollyTeacher = new Teachers(-1, jolly2, "");
         holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
 
         holder.btn_bookLesson.setEnabled(false);
@@ -106,9 +107,9 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
                 Courses course = (Courses) parent.getSelectedItem();
 
                 if(course.getIDCourse() != -1){
-                    Teachers jollyTeacher = new Teachers(-1, jolly2, "");
-                    ArrayList<Teachers> teachersList = course.getTeachersList();
-                    teachersList.add(0, jollyTeacher);
+                    ArrayList<Teachers> teachersList =  course.getTeachersList();
+                    if(!teachersList.contains(jollyTeacher))
+                        teachersList.add(0, jollyTeacher);
                     ArrayAdapter<Teachers> teacherSpinnerAdapter = new ArrayAdapter<Teachers>(mInflater.getContext(), android.R.layout.simple_spinner_item, teachersList);
                     teacherSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner_TeachersDisplayer.setAdapter(teacherSpinnerAdapter);
