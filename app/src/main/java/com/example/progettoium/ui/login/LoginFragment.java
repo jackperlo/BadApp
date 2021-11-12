@@ -1,5 +1,6 @@
 package com.example.progettoium.ui.login;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,9 +14,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentLoginBinding;
+import com.google.android.material.navigation.NavigationView;
 
 public class LoginFragment extends Fragment {
 
@@ -32,6 +35,8 @@ public class LoginFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
+        networkViewModel.testServerConnection("0", "check_connection_server");
+
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,16 +45,28 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Connessione...");
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            progressDialog.dismiss();
+            if(user == null) {
+                Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
+            } else {
+                NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
+
+                NavHostFragment.findNavController(LoginFragment.this)
+                        .navigate(R.id.action_nav_login_to_nav_home);
+            }
+        });
+
         binding.signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateEmail(binding.email) && validatePassword(binding.password)) {
-                    if(networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())){
-                        NavHostFragment.findNavController(LoginFragment.this)
-                                .navigate(R.id.action_nav_login_to_nav_home);
-                    } else {
-                        Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
-                    }
+                if (validateEmail(binding.email) && validatePassword(binding.password)) {
+                    progressDialog.show();
+                    networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString());
                 }
             }
         });

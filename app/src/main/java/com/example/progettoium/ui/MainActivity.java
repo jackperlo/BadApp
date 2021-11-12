@@ -1,9 +1,12 @@
 package com.example.progettoium.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.progettoium.utils.NetworkViewModel;
@@ -42,15 +45,15 @@ public class MainActivity extends AppCompatActivity {
         /*it must stay here because is shared between fragments (it's the side menu)*/
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
 
-        model.getRegisteredUser().observe(this, ite -> {
-            TextView txtNome = findViewById(R.id.txtNameSurname);
-            TextView txtMail = findViewById(R.id.txtMail);
+        model.getRegisteredUser().observe(this, account -> {
+            if(account != null) {
+                TextView txtNome = findViewById(R.id.txtNameSurname);
+                TextView txtMail = findViewById(R.id.txtMail);
 
-            txtNome.setText(ite.getName() + " " + ite.getSurname());
-            txtMail.setText(ite.getAccount());
+                txtNome.setText(account.getName() + " " + account.getSurname());
+                txtMail.setText(account.getAccount());
+            }
         });
-
-        //model.checkSession();
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
         DrawerLayout drawer = mainActivityBinding.drawerLayout;
@@ -58,12 +61,33 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_login)
+                R.id.nav_home, R.id.nav_login, R.id.nav_booking)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        //mainActivityBinding.loading.setVisibility(View.VISIBLE);
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Connessione...");
+        progressDialog.show();
+        model.testServerConnection("0", "check_connection_server");
+        model.getIsConnected().observe(this, connected -> {
+            if(connected) {
+                progressDialog.dismiss();
+                //mainActivityBinding.loading.setVisibility(View.INVISIBLE);
+                model.fetchBookedRepetitions();
+            } else {
+                progressDialog.show();
+                //mainActivityBinding.loading.setVisibility(View.VISIBLE);
+                model.testServerConnection("5000", "check_connection_server");
+            }
+        });
+
+        //model.checkSession();
+        //TODO: renderlo invisibile solo se non è loggato. Da fare dopo la check session
+        navigationView.getMenu().findItem(R.id.nav_booking).setVisible(false);
     }
 
     @Override

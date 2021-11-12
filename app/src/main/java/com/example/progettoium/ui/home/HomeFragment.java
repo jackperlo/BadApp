@@ -1,6 +1,7 @@
 package com.example.progettoium.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
 import com.example.progettoium.ui.home.bookedRepetitions.BookedRepetitionsCustomViewAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Observable;
 
 public class HomeFragment extends Fragment {
 
@@ -37,8 +42,17 @@ public class HomeFragment extends Fragment {
 
         RecyclerView recyclerView = binding.coursesList;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList());
+        adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
+
+        /*TRYING TO GET DATA FROM LIVEDATA*/
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
+        });
+        networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
+            if(courseObjects != null)
+                adapter.setData(courseObjects);  // setta i dati nella recyclerView
+        });
 
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -57,17 +71,14 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        //TODO: ogni volta che si è sulla home bisogna aggiornare le prenotazioni disponibili
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        /*TRYING TO GET DATA FROM LIVEDATA*/
-        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " +user.getSurname());
-        });
-        networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), repetitions -> {
-            adapter.setData(repetitions);  // setta i dati nella recyclerView
-        });
-
     }
 
     @Override

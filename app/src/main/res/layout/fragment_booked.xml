@@ -6,26 +6,16 @@
     android:layout_height="match_parent"
     android:background="@color/MAIN_BACKGROUND"
     android:orientation="vertical"
-    tools:context=".ui.home.HomeFragment">
-
-    <TextView
-        android:id="@+id/lbl_welcome_main_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/welcome_user"
-        android:textColor="@color/black"
-        android:textSize="30sp" />
+    tools:context=".ui.booked.BookedFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="525dp"
         app:cardElevation="15dp">
 
 
         <LinearLayout
-            android:id="@+id/linearLayoutBooking"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -41,31 +31,22 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/monday" />
+                    android:text="@string/attive" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tuesday" />
+                    android:text="@string/cancellate" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/wednesday" />
+                    android:text="@string/seguite" />
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/thursday" />
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/friday" />
             </com.google.android.material.tabs.TabLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/courses_list"
+                android:id="@+id/courses_list_history"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -76,4 +57,9 @@
 
     </androidx.cardview.widget.CardView>
 
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/indietro" />
 </LinearLayout>
