@@ -47,7 +47,8 @@ public class HomeFragment extends Fragment {
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
+            if(user != null)
+                binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
         });
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             if(courseObjects != null)

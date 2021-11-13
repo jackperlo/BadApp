@@ -49,6 +49,7 @@ public class LoginFragment extends Fragment {
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Connessione...");
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
             progressDialog.dismiss();
             if(user == null) {
                 Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();

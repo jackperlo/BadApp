@@ -64,8 +64,10 @@ public class NetworkViewModel extends AndroidViewModel {
         return bookedRepetitionsData;
     }
 
-    public FreeRepetitionsLiveData getFreeRepetitions(){ return freeRepetitionsData; }
-    
+    public FreeRepetitionsLiveData getFreeRepetitions() {
+        return freeRepetitionsData;
+    }
+
     public ConnectionLiveData getIsConnected() {
         return isConnected;
     }
@@ -142,7 +144,7 @@ public class NetworkViewModel extends AndroidViewModel {
         }
     }
 
-    public void fetchFreeRepetitions(String day){
+    public void fetchFreeRepetitions(String day) {
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
         launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
@@ -155,9 +157,9 @@ public class NetworkViewModel extends AndroidViewModel {
         HttpURLConnection conn = null;
 
         String parameters = "";
-        int i=0;
+        int i = 0;
         for (String itemKey : params.keySet()) {
-            if(i==0)
+            if (i == 0)
                 parameters += itemKey + "=" + params.get(itemKey);
             else
                 parameters += "&" + itemKey + "=" + params.get(itemKey);
@@ -174,11 +176,11 @@ public class NetworkViewModel extends AndroidViewModel {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
-            conn.setRequestProperty( "Content-Length", Integer.toString(postDataLength));
+            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
             conn.setUseCaches(false);
             conn.setDoOutput(true);
 
-            try(DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
                 wr.write(postData);
                 wr.flush();
             }
@@ -190,7 +192,7 @@ public class NetworkViewModel extends AndroidViewModel {
             return readIt(conn.getInputStream());
         } catch (Exception ex) {
             Log.e("async", ex.getMessage());
-            return "no_connection";
+            return "{'done': false, 'error': 'no_connection'}";
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -229,7 +231,7 @@ public class NetworkViewModel extends AndroidViewModel {
             return readIt(conn.getInputStream());
         } catch (Exception ex) {
             Log.e("async", ex.getMessage());
-            return "no_connection";
+            return "{'done': false, 'error': 'no_connection'}";
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -262,70 +264,59 @@ public class NetworkViewModel extends AndroidViewModel {
             //TODO: quando si entra nella pagina di login arrviano dei dati dal server sulle prenotazioni
             //TODO: dividere i live data delle booking e delle booked perchè quando si passa della booked alle booking rimangono visualizzate quelle booked
             try {
-                if (val.equals("no_connection")) {
-                    if (service.equals("login") || service.equals("registration"))
-                        usersData.updateUser(null);
-                    else if (service.equals("booked"))
-                        bookedRepetitionsData.updateBookedRepetitions(null);
-                    else if (service.equals("free"))
-                        freeRepetitionsData.updateFreeRepetitions(null);
+                json.set(new JSONObject(val));
+                boolean isDone = json.get().getBoolean("done");
 
-                    isConnected.setValue(false);
-                } else {
-                    json.set(new JSONObject(val));
-                    boolean isDone = json.get().getBoolean("done");
-
+                if (!isDone) {
                     if (service.equals("login") || service.equals("registration")) {
-                        if (isDone)
-                            if (service.equals("login"))
-                                usersData.updateUser(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
-                            else
-                                usersData.updateUser(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
+                        usersData.updateUser(null);
+                    } else if (service.equals("booked"))
+                        bookedRepetitionsData.updateBookedRepetitions(new ArrayList<BookedRepetitions>());
+                    else if (service.equals("free"))
+                        freeRepetitionsData.updateFreeRepetitions(new ArrayList<FreeRepetitions>());
+
+                    //isConnected.setValue(false);
+                } else {
+                    if (service.equals("login") || service.equals("registration")) {
+                        if (service.equals("login"))
+                            usersData.updateUser(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
                         else
-                            usersData.updateUser(null);
+                            usersData.updateUser(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
                     } else if (service.equals("free")) {
                         ArrayList<FreeRepetitions> freeRepetitions = new ArrayList<FreeRepetitions>();
-                        if(isDone){
-                            ArrayList<Courses> courses = null;
-                            ArrayList<Teachers> teachers = null;
-            
-                            JSONArray jsonArray = json.get().getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); ++i) { //for every hour of that day
-                                JSONObject jsonItem = jsonArray.getJSONObject(i);
-                                JSONArray coursesList = jsonItem.getJSONArray("coursesList");
-                                courses = new ArrayList<>();
-                                for (int j = 0; j < coursesList.length(); ++j){ //for every available course
-                                    JSONObject courseItem = coursesList.getJSONObject(j);
-                                    JSONArray teachersList = courseItem.getJSONArray("teachersList");
-                                    teachers = new ArrayList<>();
-                                    for (int k = 0; k < teachersList.length(); ++k){ //for every teacher available to do repetition for that course at that time
-                                        JSONObject teacherItem = teachersList.getJSONObject(k);
-                                        Teachers teacher = new Teachers(teacherItem.getInt("IDTeacher"), teacherItem.getString("Name"), teacherItem.getString("Surname"));
-                                        teachers.add(teacher);
-                                    }
-                                    Courses course = new Courses(courseItem.getInt("IDCourse"), courseItem.getString("Title"), teachers);
-                                    courses.add(course);
+                        ArrayList<Courses> courses = null;
+                        ArrayList<Teachers> teachers = null;
+
+                        JSONArray jsonArray = json.get().getJSONArray("results");
+                        for (int i = 0; i < jsonArray.length(); ++i) { //for every hour of that day
+                            JSONObject jsonItem = jsonArray.getJSONObject(i);
+                            JSONArray coursesList = jsonItem.getJSONArray("coursesList");
+                            courses = new ArrayList<>();
+                            for (int j = 0; j < coursesList.length(); ++j) { //for every available course
+                                JSONObject courseItem = coursesList.getJSONObject(j);
+                                JSONArray teachersList = courseItem.getJSONArray("teachersList");
+                                teachers = new ArrayList<>();
+                                for (int k = 0; k < teachersList.length(); ++k) { //for every teacher available to do repetition for that course at that time
+                                    JSONObject teacherItem = teachersList.getJSONObject(k);
+                                    Teachers teacher = new Teachers(teacherItem.getInt("IDTeacher"), teacherItem.getString("Name"), teacherItem.getString("Surname"));
+                                    teachers.add(teacher);
                                 }
-                                FreeRepetitions item = new FreeRepetitions(params.get("day"), jsonItem.getString("startTime"), courses);
-                                freeRepetitions.add(item);
+                                Courses course = new Courses(courseItem.getInt("IDCourse"), courseItem.getString("Title"), teachers);
+                                courses.add(course);
                             }
-                            freeRepetitionsData.updateFreeRepetitions(freeRepetitions);
-                        }else
-                            freeRepetitionsData.updateFreeRepetitions(freeRepetitions);
+                            FreeRepetitions item = new FreeRepetitions(params.get("day"), jsonItem.getString("startTime"), courses);
+                            freeRepetitions.add(item);
+                        }
+                        freeRepetitionsData.updateFreeRepetitions(freeRepetitions);
                     } else if (service.equals("booked")) {
                         ArrayList<BookedRepetitions> bookedRepetitions = new ArrayList<BookedRepetitions>();
-                        if (isDone) {
-                            JSONArray jsonArray = json.get().getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); ++i) {
-                                JSONObject jsonItem = jsonArray.getJSONObject(i);
-                                BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"));
-                                bookedRepetitions.add(item);
-                            }
-                            bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
-                        } else {
-                            Toast.makeText(getApplication().getApplicationContext(), json.get().getString("error"), Toast.LENGTH_LONG).show();
-                            bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                        JSONArray jsonArray = json.get().getJSONArray("results");
+                        for (int i = 0; i < jsonArray.length(); ++i) {
+                            JSONObject jsonItem = jsonArray.getJSONObject(i);
+                            BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"));
+                            bookedRepetitions.add(item);
                         }
+                        bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
                     }
                 }
             } catch (JSONException jsonException) {
@@ -350,7 +341,15 @@ public class NetworkViewModel extends AndroidViewModel {
 
         @Override
         protected void onPostExecute(String s) {
-            isConnected.setValue(!(s.equals("no_connection") || s.equals("no_connection\n"))); //Il server risponde con un \n alla fine
+            JSONObject jsonObject;
+            try {
+                jsonObject = new JSONObject(s);
+                boolean connection = jsonObject.getBoolean("done");
+
+                isConnected.setValue(connection);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
