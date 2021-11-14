@@ -21,6 +21,7 @@ import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
 import com.example.progettoium.ui.home.bookedRepetitions.BookedRepetitionsCustomViewAdapter;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -50,9 +51,16 @@ public class HomeFragment extends Fragment {
             if(user != null)
                 binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
         });
+
+        //TODO: permettere all'utente di refreshare le lezioni prenotabili
+        //TODO: ci deve essere un caricamento iniziale per compesare la possibilita del db down
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             if(courseObjects != null)
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
+            else {
+                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
         });
 
         TabLayout tabLayout = binding.tabLayout;
@@ -68,12 +76,6 @@ public class HomeFragment extends Fragment {
         });
 
         return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //TODO: ogni volta che si è sulla home bisogna aggiornare le prenotazioni disponibili
     }
 
     @Override

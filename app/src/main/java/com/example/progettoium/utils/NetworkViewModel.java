@@ -1,6 +1,8 @@
 package com.example.progettoium.utils;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -171,8 +173,8 @@ public class NetworkViewModel extends AndroidViewModel {
         try {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(15000 /* milliseconds */);
-            conn.setConnectTimeout(8000 /* milliseconds */);
+            conn.setReadTimeout(20000 /* milliseconds */);
+            conn.setConnectTimeout(20000 /* milliseconds */);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -219,8 +221,8 @@ public class NetworkViewModel extends AndroidViewModel {
         try {
             URL url = new URL(urlServer);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(15000 /* milliseconds */);
-            conn.setConnectTimeout(8000 /* milliseconds */);
+            conn.setReadTimeout(20000 /* milliseconds */);
+            conn.setConnectTimeout(20000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 
@@ -262,20 +264,28 @@ public class NetworkViewModel extends AndroidViewModel {
             else
                 val = null;
             //TODO: quando si entra nella pagina di login arrviano dei dati dal server sulle prenotazioni
-            //TODO: dividere i live data delle booking e delle booked perchè quando si passa della booked alle booking rimangono visualizzate quelle booked
             try {
                 json.set(new JSONObject(val));
                 boolean isDone = json.get().getBoolean("done");
 
                 if (!isDone) {
-                    if (service.equals("login") || service.equals("registration")) {
-                        usersData.updateUser(null);
-                    } else if (service.equals("booked"))
-                        bookedRepetitionsData.updateBookedRepetitions(new ArrayList<BookedRepetitions>());
-                    else if (service.equals("free"))
-                        freeRepetitionsData.updateFreeRepetitions(new ArrayList<FreeRepetitions>());
+                    if(json.get().getString("error").equals("no_connection"))
+                        isConnected.updateConnection(false);
 
-                    //isConnected.setValue(false);
+                    if (service.equals("login") || service.equals("registration"))
+                        if(json.get().getString("error").equals("registration failed") || json.get().getString("error").equals("user not found"))
+                            usersData.updateUser(new User());
+                        else{
+                            //Errore sul db --> il db non è connesso...
+                            usersData.updateUser(null);
+                        }
+                    else if (service.equals("booked")) {
+                        //Errore sul db --> il db non è connesso...
+                        bookedRepetitionsData.updateBookedRepetitions(null);
+                    } else if(service.equals("free")){
+                        //Errore sul db --> il db non è connesso...
+                        freeRepetitionsData.updateFreeRepetitions(null);
+                    }
                 } else {
                     if (service.equals("login") || service.equals("registration")) {
                         if (service.equals("login"))

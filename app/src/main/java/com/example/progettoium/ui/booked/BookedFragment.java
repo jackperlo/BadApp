@@ -20,6 +20,7 @@ import com.example.progettoium.databinding.FragmentBookedBinding;
 import com.example.progettoium.ui.booked.bookedHistory.BookedHistoryCustomViewAdapter;
 import com.example.progettoium.ui.home.bookedRepetitions.BookedRepetitionsCustomViewAdapter;
 import com.example.progettoium.utils.NetworkViewModel;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -44,14 +45,16 @@ public class BookedFragment extends Fragment {
         adapter = new BookedHistoryCustomViewAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
-        //TODO: controllare se cade la connessione cosa fare, oppure essere sicuri che la  connessione ci sia
         networkViewModel.fetchBookedHistory();
         networkViewModel.testServerConnection("0", "check_connection_server");
 
         networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             if(courseObjects != null)
                 adapter.setData(courseObjects);
+            else {
+                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
         });
 
         TabLayout tabLayout = binding.tabLayout;

@@ -6,6 +6,7 @@ public class User {
     String role;
     String name;
     String surname;
+    boolean isEmpty;
 
     //user used for Registration
     public User(String account, String pwd, String role, String name, String surname) {
@@ -14,10 +15,16 @@ public class User {
         this.role = role;
         this.name = name;
         this.surname = surname;
+        this.isEmpty = false;
     }
 
     public User() {
-
+        this.account = "guest@email.com";
+        this.pwd = null;
+        this.role = null;
+        this.name = "Guest";
+        this.surname = "Guest";
+        this.isEmpty = true;
     }
 
     //user used for Login
@@ -25,6 +32,7 @@ public class User {
         this.account = account;
         this.name = name;
         this.surname = surname;
+        this.isEmpty = false;
     }
 
     public String getAccount() {
@@ -45,6 +53,10 @@ public class User {
 
     public String getSurname() {
         return surname;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
     }
 
 }

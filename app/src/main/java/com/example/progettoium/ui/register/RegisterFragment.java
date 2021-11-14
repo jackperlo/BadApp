@@ -17,6 +17,7 @@ import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentRegisterBinding;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 public class RegisterFragment extends Fragment {
 
@@ -39,9 +40,12 @@ public class RegisterFragment extends Fragment {
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             progressDialog.dismiss();
-            if(user == null)
+            if(user == null) {
+                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            } else if(user.isEmpty()) {
                 Toast.makeText(getContext(), "Registration failed! Try Again!", Toast.LENGTH_LONG).show();
-            else {
+            } else {
                 NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                 navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
                 navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);

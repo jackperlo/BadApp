@@ -19,6 +19,7 @@ import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentLoginBinding;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 public class LoginFragment extends Fragment {
 
@@ -35,7 +36,6 @@ public class LoginFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
-        // TODO: necessario quello che segue?
         networkViewModel.testServerConnection("0", "check_connection_server");
 
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +52,9 @@ public class LoginFragment extends Fragment {
             //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
             progressDialog.dismiss();
             if(user == null) {
+                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            } else if(user.isEmpty()){
                 Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
             } else {
                 NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
