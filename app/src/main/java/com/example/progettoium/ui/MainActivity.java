@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 progressDialog.show();
                 //mainActivityBinding.loading.setVisibility(View.VISIBLE);
-                model.testServerConnection("5000", "check_connection_server");
+                model.testServerConnection("2500", "check_connection_server");
             }
         });
 

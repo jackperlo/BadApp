@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ import com.example.progettoium.R;
 import com.example.progettoium.data.BookedRepetitions;
 
 import java.util.List;
+import java.util.Locale;
 
 public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedHistoryCustomViewAdapter.ViewHolder> {
     private List<BookedRepetitions> mData;
@@ -41,6 +43,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             String[] temp = course.getStartTime().split(":");
             int endTime = Integer.parseInt(temp[0]) + 1;
             holder.lbl_CourseEndTime.setText("" + endTime + ":00");
+            holder.lbl_Day.setText(course.getDay());
 
             holder.lbl_TeacherDisplayer.setText(String.valueOf(course.getTitle()));
             holder.lbl_CourseDisplayer.setText(String.valueOf(course.getSurname() + " " + course.getName()));
@@ -57,6 +60,8 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
         TextView lbl_CourseEndTime;
         TextView lbl_CourseDisplayer;
         TextView lbl_TeacherDisplayer;
+        TextView lbl_Day;
+        Button btn_cancel;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -64,6 +69,9 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             lbl_CourseEndTime = itemView.findViewById(R.id.lbl_CourseEndTime);
             lbl_CourseDisplayer = itemView.findViewById(R.id.lbl_CourseDisplayer);
             lbl_TeacherDisplayer = itemView.findViewById(R.id.lbl_TeacherDisplayer);
+            lbl_Day = itemView.findViewById(R.id.lbl_Day);
+            btn_cancel = itemView.findViewById(R.id.btn_cancel);
+            btn_cancel.setOnClickListener(this);
         }
 
         @Override
