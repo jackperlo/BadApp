@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.progettoium.data.FreeRepetitions;
 import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
@@ -61,10 +62,10 @@ public class HomeFragment extends Fragment {
             progressDialog.dismiss();
             if(courseObjects != null) {
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
-                binding.swipeRefreshLayoutBooking.setRefreshing(false);
-            } else {
-                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            else {
+                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                ArrayList<FreeRepetitions> frep = new ArrayList<>();
+                adapter.setData(frep);
             }
         });
 
@@ -125,8 +126,4 @@ public class HomeFragment extends Fragment {
         return ret;
     }
 
-    public void fetchFreeRepetitions(){
-        TabLayout tabLayout = binding.tabLayout;
-        networkViewModel.fetchFreeRepetitions(getWeekDay(tabLayout.getSelectedTabPosition()));
-    }
 }
