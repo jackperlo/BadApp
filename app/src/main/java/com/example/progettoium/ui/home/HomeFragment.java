@@ -1,5 +1,6 @@
 package com.example.progettoium.ui.home;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.progettoium.ui.MainActivity;
 import com.example.progettoium.utils.NetworkViewModel;
@@ -53,11 +55,15 @@ public class HomeFragment extends Fragment {
         });
 
         //TODO: permettere all'utente di refreshare le lezioni prenotabili
-        //TODO: ci deve essere un caricamento iniziale per compesare la possibilita del db down
+        ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Connessione...");
+        progressDialog.show();
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            if(courseObjects != null)
+            progressDialog.dismiss();
+            if(courseObjects != null) {
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
-            else {
+                binding.swipeRefreshLayoutBooking.setRefreshing(false);
+            } else {
                 Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -73,6 +79,13 @@ public class HomeFragment extends Fragment {
             public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
+        binding.swipeRefreshLayoutBooking.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+            }
         });
 
         return root;

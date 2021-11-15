@@ -52,7 +52,8 @@
     <!--Booked Repetitions-->
     <string name="my_reservations">My Reservations</string>
     <string name="active">Active</string>
-    <string name="deleted">Deleted</string>
     <string name="done">Done</string>
     <string name="back">Back</string>
+    <string name="log_out">Log out</string>
+    <string name="cancelled">Cancelled</string>
 </resources>

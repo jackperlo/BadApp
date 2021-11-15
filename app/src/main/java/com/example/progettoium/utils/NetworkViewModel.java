@@ -12,6 +12,7 @@ import com.example.progettoium.data.Courses;
 import com.example.progettoium.data.FreeRepetitions;
 import com.example.progettoium.data.Teachers;
 import com.example.progettoium.data.User;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -45,7 +46,6 @@ public class NetworkViewModel extends AndroidViewModel {
     private final UserLiveData usersData;
     private final FreeRepetitionsLiveData freeRepetitionsData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
-    private int selectedHistoryTab = 0;
     private final ConnectionLiveData isConnected;
 
     public NetworkViewModel(Application application) {
@@ -120,25 +120,17 @@ public class NetworkViewModel extends AndroidViewModel {
         }
     }
 
+    public void logoutUser() {
+        launchThread(myURLs.getServerUrlLogin(), new HashMap<>(), "GET", "logut");
+    }
+
     public void testServerConnection(String timeout, String type) {
         new CheckConnectionAsync().execute(myURLs.getServerUrlCheckSession(), timeout, type);
     }
 
-    public void setSelectedHistoryTab(int selectedHistoryTab) {
-        this.selectedHistoryTab = selectedHistoryTab;
-    }
-
-    public void fetchBookedHistory() {
+    public void fetchBookedHistory(String state) {
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<>();
-
-            String state = "Active";
-            if (selectedHistoryTab == 0)
-                state = "Active";
-            else if (selectedHistoryTab == 1)
-                state = "Canelled";
-            else
-                state = "Done";
 
             items.put("state", state);
             items.put("account", usersData.getValue().getAccount());
@@ -263,6 +255,7 @@ public class NetworkViewModel extends AndroidViewModel {
                 val = sendPOSTRequest(url, params);
             else
                 val = null;
+
             //TODO: quando si entra nella pagina di login arrviano dei dati dal server sulle prenotazioni
             try {
                 json.set(new JSONObject(val));
@@ -327,6 +320,8 @@ public class NetworkViewModel extends AndroidViewModel {
                             bookedRepetitions.add(item);
                         }
                         bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
+                    } else if(service.equals("logout")) {
+                        usersData.updateUser(new User());
                     }
                 }
             } catch (JSONException jsonException) {

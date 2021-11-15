@@ -59,7 +59,8 @@ public class LoginFragment extends Fragment {
             } else {
                 NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                 navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
+                navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
+                getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
 
                 NavHostFragment.findNavController(LoginFragment.this)
                         .navigate(R.id.action_nav_login_to_nav_home);
