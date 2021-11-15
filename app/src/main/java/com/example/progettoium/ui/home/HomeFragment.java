@@ -62,7 +62,8 @@ public class HomeFragment extends Fragment {
             progressDialog.dismiss();
             if(courseObjects != null) {
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
-            else {
+                binding.swipeRefreshLayoutBooking.setRefreshing(false);
+            } else {
                 Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 ArrayList<FreeRepetitions> frep = new ArrayList<>();
                 adapter.setData(frep);

@@ -77,14 +77,6 @@ public class BookedFragment extends Fragment {
             }
         });
 
-        binding.btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(BookedFragment.this)
-                        .navigate(R.id.action_nav_booked_to_nav_home);
-            }
-        });
-
         binding.swipeRefreshLayoutBooked.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
