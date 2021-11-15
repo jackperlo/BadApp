@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,13 +46,14 @@ public class BookedFragment extends Fragment {
         adapter = new BookedHistoryCustomViewAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        networkViewModel.fetchBookedHistory();
+        networkViewModel.fetchBookedHistory(getTabState(binding.tabLayout.getSelectedTabPosition()));
         networkViewModel.testServerConnection("0", "check_connection_server");
 
         networkViewModel.getBookedRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            if(courseObjects != null)
+            if(courseObjects != null) {
                 adapter.setData(courseObjects);
-            else {
+                binding.swipeRefreshLayoutBooked.setRefreshing(false);
+            } else {
                 Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -61,8 +63,7 @@ public class BookedFragment extends Fragment {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                networkViewModel.setSelectedHistoryTab(tab.getPosition());
-                networkViewModel.fetchBookedHistory();
+                networkViewModel.fetchBookedHistory(getTabState(tab.getPosition()));
             }
 
             @Override
@@ -84,7 +85,26 @@ public class BookedFragment extends Fragment {
             }
         });
 
+        binding.swipeRefreshLayoutBooked.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                networkViewModel.fetchBookedHistory(getTabState(binding.tabLayout.getSelectedTabPosition()));
+            }
+        });
+
         return root;
+    }
+
+    private String getTabState(int tabValue) {
+        String state = "Active";
+        if (tabValue == 0)
+            state = "Active";
+        else if (tabValue == 1)
+            state = "Cancelled";
+        else
+            state = "Done";
+
+        return state;
     }
 
     @Override

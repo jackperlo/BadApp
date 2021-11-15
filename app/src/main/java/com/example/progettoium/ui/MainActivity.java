@@ -6,15 +6,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.progettoium.data.BookedRepetitions;
+import com.example.progettoium.data.User;
 import com.example.progettoium.databinding.FragmentHomeBinding;
 import com.example.progettoium.ui.home.HomeFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -24,10 +28,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.progettoium.databinding.ActivityMainBinding;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_login, R.id.nav_booking)
+                R.id.nav_home, R.id.nav_login, R.id.nav_booked)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -89,9 +95,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mainActivityBinding.btnLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                model.logoutUser();
+                model.getBookedRepetitions().updateBookedRepetitions(new ArrayList<>());
+                mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
+                navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
+                navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+                drawer.closeDrawer(navigationView);
+
+                //TODO: avvisare che il logout è stato fatto
+            }
+        });
+
         //model.checkSession();
         //TODO: renderlo invisibile solo se non è loggato. Da fare dopo la check session
-        navigationView.getMenu().findItem(R.id.nav_booking).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
+        mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
     }
 
     @Override
