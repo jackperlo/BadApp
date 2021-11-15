@@ -54,7 +54,6 @@ public class HomeFragment extends Fragment {
                 binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
         });
 
-        //TODO: permettere all'utente di refreshare le lezioni prenotabili
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Connessione...");
         progressDialog.show();
