@@ -11,31 +11,30 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.progettoium.R;
 import com.example.progettoium.data.FreeRepetitions;
-import com.example.progettoium.ui.MainActivity;
+import com.example.progettoium.ui.booked.BookedFragment;
+import com.example.progettoium.ui.login.LoginFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.databinding.FragmentHomeBinding;
-import com.example.progettoium.ui.home.bookedRepetitions.BookedRepetitionsCustomViewAdapter;
+import com.example.progettoium.ui.home.freeRepetitions.FreeRepetitionsCustomViewAdapter;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
-import java.util.Observable;
 
 public class HomeFragment extends Fragment {
 
     private NetworkViewModel networkViewModel;
     private FragmentHomeBinding binding;
 
-    BookedRepetitionsCustomViewAdapter adapter;
+    FreeRepetitionsCustomViewAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
@@ -46,7 +45,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView recyclerView = binding.coursesList;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new BookedRepetitionsCustomViewAdapter(getContext(), new ArrayList<>());
+        adapter = new FreeRepetitionsCustomViewAdapter(getContext(), new ArrayList<>(), networkViewModel);
         recyclerView.setAdapter(adapter);
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
@@ -70,11 +69,20 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        networkViewModel.getbookRepetitionData().observe(getViewLifecycleOwner(), status -> {
+            ProgressDialog pdBookARepetition = adapter.getBookARepetitionDialog();
+            pdBookARepetition.dismiss();
+            Snackbar.make(getView(), status, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+            networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+        });
+
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 networkViewModel.fetchFreeRepetitions(getWeekDay(tab.getPosition()));
+                networkViewModel.setOnDay(getWeekDay(tab.getPosition()));
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
@@ -86,6 +94,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onRefresh() {
                 networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+                networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
             }
         });
 
@@ -116,7 +125,7 @@ public class HomeFragment extends Fragment {
                 ret = "Wednesday";
                 break;
             case 3:
-                ret = "Thurday";
+                ret = "Thursday";
                 break;
             case 4:
                 ret = "Friday";

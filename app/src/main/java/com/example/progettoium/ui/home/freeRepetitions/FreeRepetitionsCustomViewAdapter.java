@@ -1,15 +1,17 @@
-package com.example.progettoium.ui.home.bookedRepetitions;
+package com.example.progettoium.ui.home.freeRepetitions;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,19 +24,27 @@ import java.util.List;
 import com.example.progettoium.R;
 import com.example.progettoium.data.Courses;
 import com.example.progettoium.data.FreeRepetitions;
-import com.example.progettoium.data.Teach;
 import com.example.progettoium.data.Teachers;
+import com.example.progettoium.data.User;
+import com.example.progettoium.utils.NetworkViewModel;
+import com.example.progettoium.utils.UserLiveData;
+import com.google.android.material.snackbar.Snackbar;
 
-public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<BookedRepetitionsCustomViewAdapter.ViewHolder> {
+public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeRepetitionsCustomViewAdapter.ViewHolder> {
 
     private List<FreeRepetitions> mData;
     private LayoutInflater mInflater;
     private Teachers jollyTeacher;
+    private Courses selectedCourse;
+    private Teachers selectedTeacher;
+    private NetworkViewModel networkViewModel;
+    private ProgressDialog bookARepetitionDialog;
 
     // data is passed into the constructor
-    public BookedRepetitionsCustomViewAdapter(Context context, List<FreeRepetitions> data) {
+    public FreeRepetitionsCustomViewAdapter(Context context, List<FreeRepetitions> data, NetworkViewModel networkViewModel) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.networkViewModel = networkViewModel;
     }
 
     // inflates the row layout from xml when needed
@@ -43,6 +53,8 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
         View view = mInflater.inflate(R.layout.course_list_item, parent, false);
         return new ViewHolder(view);
     }
+
+    public ProgressDialog getBookARepetitionDialog(){return this.bookARepetitionDialog;}
 
     // binds the data in the recycler view for each row
     @Override
@@ -67,7 +79,7 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
         jollyTeacher = new Teachers(-1, jolly2, "");
         holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
 
-        holder.btn_bookLesson.setEnabled(false);
+        holder.btn_bookLesson.setVisibility(View.GONE);
     }
 
     // total number of rows
@@ -98,16 +110,19 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(view.getContext(),"CLICK: "+getAdapterPosition(),Toast.LENGTH_LONG).show();
+            networkViewModel.bookARepetition(selectedCourse, selectedTeacher, (String) lbl_CourseStartTime.getText());
+            bookARepetitionDialog = new ProgressDialog(mInflater.getContext());
+            bookARepetitionDialog.setMessage("Connessione...");
+            bookARepetitionDialog.show();
         }
 
         AdapterView.OnItemSelectedListener onItemSeletctedCourseSpinner = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Courses course = (Courses) parent.getSelectedItem();
+                selectedCourse = (Courses) parent.getSelectedItem();
 
-                if(course.getIDCourse() != -1){
-                    ArrayList<Teachers> teachersList =  course.getTeachersList();
+                if(selectedCourse.getIDCourse() != -1){
+                    ArrayList<Teachers> teachersList =  selectedCourse.getTeachersList();
                     if(!teachersList.contains(jollyTeacher))
                         teachersList.add(0, jollyTeacher);
                     ArrayAdapter<Teachers> teacherSpinnerAdapter = new ArrayAdapter<Teachers>(mInflater.getContext(), android.R.layout.simple_spinner_item, teachersList);
@@ -120,6 +135,8 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
                 }else{
                     if(spinner_TeachersDisplayer.getVisibility() == View.VISIBLE)
                         spinner_TeachersDisplayer.setVisibility(View.GONE);
+                    if(btn_bookLesson.getVisibility() == View.VISIBLE)
+                        btn_bookLesson.setVisibility(View.GONE);
                 }
 
                 //Toast.makeText(mInflater.getContext(), "Course ID: "+course.getIDCourse()+", Title : "+course.getTitle(), Toast.LENGTH_SHORT).show();
@@ -134,8 +151,16 @@ public class BookedRepetitionsCustomViewAdapter extends RecyclerView.Adapter<Boo
         AdapterView.OnItemSelectedListener onItemSeletctedTeacherSpinner = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Teachers teacher = (Teachers) parent.getSelectedItem();
+                selectedTeacher = (Teachers) parent.getSelectedItem();
                 //Toast.makeText(mInflater.getContext(), "Teacher ID: "+teacher.getIDTeacher()+", Teacher : "+teacher.getFullName(), Toast.LENGTH_SHORT).show();
+                if(selectedTeacher.getIDTeacher() != -1){
+                    User loggedUser =  networkViewModel.getRegisteredUser().getValue();
+                    if(loggedUser != null && loggedUser.getAccount() != null && loggedUser.getSurname() != null && loggedUser.getName() != null)
+                        btn_bookLesson.setVisibility(View.VISIBLE);
+                }else{
+                    if(btn_bookLesson.getVisibility() == View.VISIBLE)
+                        btn_bookLesson.setVisibility(View.GONE);
+                }
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {

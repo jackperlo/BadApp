@@ -2,6 +2,7 @@ package com.example.progettoium.utils;
 
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -47,6 +48,8 @@ public class NetworkViewModel extends AndroidViewModel {
     private final FreeRepetitionsLiveData freeRepetitionsData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
     private final ConnectionLiveData isConnected;
+    private final BookRepetitionLiveData bookRepetitionData;
+    private String onDay="";
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -55,6 +58,11 @@ public class NetworkViewModel extends AndroidViewModel {
         freeRepetitionsData = new FreeRepetitionsLiveData();
         bookedRepetitionsData = new BookedRepetitionsLiveData();
         isConnected = new ConnectionLiveData();
+        bookRepetitionData = new BookRepetitionLiveData();
+    }
+
+    public void setOnDay(String onDay){
+        this.onDay = onDay;
     }
 
     /*GETTING DATA FROM LIVE DATA ALREADY FILLED UP FROM DB QUERIES*/
@@ -72,6 +80,10 @@ public class NetworkViewModel extends AndroidViewModel {
 
     public ConnectionLiveData getIsConnected() {
         return isConnected;
+    }
+
+    public BookRepetitionLiveData getbookRepetitionData() {
+        return bookRepetitionData;
     }
     /*END GETTING DATA FROM LIVE DATA*/
 
@@ -121,7 +133,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public void logoutUser() {
-        launchThread(myURLs.getServerUrlLogin(), new HashMap<>(), "GET", "logut");
+        launchThread(myURLs.getServerUrlLogin(), new HashMap<>(), "GET", "logout");
     }
 
     public void testServerConnection(String timeout, String type) {
@@ -142,6 +154,12 @@ public class NetworkViewModel extends AndroidViewModel {
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
         launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
+    }
+
+    public void bookARepetition(Courses selectedCourse, Teachers selectedTeacher, String startTime){
+        //launchThread(myURLs.getServerUrlBookARepetition(), items, "POST", "book");
+
+        new BookARepetition().execute(myURLs.getServerUrlBookARepetition(), String.valueOf(3000), this.onDay, startTime, String.valueOf(selectedCourse.getIDCourse()), String.valueOf(selectedTeacher.getIDTeacher()), usersData.getValue().getAccount());
     }
     /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
 
@@ -352,6 +370,38 @@ public class NetworkViewModel extends AndroidViewModel {
                 boolean connection = jsonObject.getBoolean("done");
 
                 isConnected.setValue(connection);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class BookARepetition extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                Thread.sleep(Integer.parseInt(strings[1]));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            HashMap<String, String> items = new HashMap<>();
+            items.put("day", strings[2]);
+            items.put("startTime", strings[3]);
+            items.put("IDCourse", strings[4]);
+            items.put("IDTeacher", strings[5]);
+            items.put("account", strings[6]);
+
+            return sendPOSTRequest(strings[0], items);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            JSONObject jsonObject;
+            try {
+                jsonObject = new JSONObject(s);
+                String result = jsonObject.getString("results");
+                bookRepetitionData.setValue(result);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
