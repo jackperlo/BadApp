@@ -6,6 +6,7 @@ public class myURLs {
     private static final String serverUrlCheckSession = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-check-session";
     private static final String serverUrlFreeRepetitions = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-get-free-repetitions";
     private static final String serverUrlBookedHistoryRepetitions = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-get-booked-history-repetitions";
+    private static final String serverUrlManageRepetitions = "http://10.0.2.2:8080/ProvaAppAndroid_war_exploded/servlet-manage-repetitions";
 
     public static String getServerUrlRegistration() {
         return serverUrlRegistration;
@@ -24,4 +25,8 @@ public class myURLs {
     }
 
     public static String getServerUrlBookedHistoryRepetitions() {return serverUrlBookedHistoryRepetitions;}
+
+    public static String getServerUrlManageRepetitions() {
+        return serverUrlManageRepetitions;
+    }
 }

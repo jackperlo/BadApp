@@ -43,7 +43,7 @@ public class BookedFragment extends Fragment {
 
         RecyclerView recyclerView = binding.coursesListHistory;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new BookedHistoryCustomViewAdapter(getContext(), new ArrayList<>());
+        adapter = new BookedHistoryCustomViewAdapter(getContext(), new ArrayList<>(), networkViewModel);
         recyclerView.setAdapter(adapter);
 
         networkViewModel.fetchBookedHistory(getTabState(binding.tabLayout.getSelectedTabPosition()));
@@ -80,6 +80,14 @@ public class BookedFragment extends Fragment {
         binding.swipeRefreshLayoutBooked.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                networkViewModel.fetchBookedHistory(getTabState(binding.tabLayout.getSelectedTabPosition()));
+            }
+        });
+
+        networkViewModel.getManaged().observe(getViewLifecycleOwner(), manged -> {
+            if(manged == null) {
+                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else if (manged){
                 networkViewModel.fetchBookedHistory(getTabState(binding.tabLayout.getSelectedTabPosition()));
             }
         });
