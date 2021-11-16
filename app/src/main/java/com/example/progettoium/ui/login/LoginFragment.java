@@ -47,7 +47,7 @@ public class LoginFragment extends Fragment {
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Connessione...");
+        progressDialog.setMessage("Connection...");
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
             progressDialog.dismiss();

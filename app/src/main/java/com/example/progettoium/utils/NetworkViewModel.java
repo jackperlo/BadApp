@@ -48,9 +48,10 @@ public class NetworkViewModel extends AndroidViewModel {
     private final FreeRepetitionsLiveData freeRepetitionsData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
     private final ConnectionLiveData isConnected;
-    private final ManageRepetitionsLiveData managed;
+    private final ManageRepetitionsLiveData managedData;
     private final BookRepetitionLiveData bookRepetitionData;
     private String onDay="";
+    private String onState="";
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -59,12 +60,20 @@ public class NetworkViewModel extends AndroidViewModel {
         freeRepetitionsData = new FreeRepetitionsLiveData();
         bookedRepetitionsData = new BookedRepetitionsLiveData();
         isConnected = new ConnectionLiveData();
-        managed = new ManageRepetitionsLiveData();
+        managedData = new ManageRepetitionsLiveData();
         bookRepetitionData = new BookRepetitionLiveData();
     }
 
     public void setOnDay(String onDay){
         this.onDay = onDay;
+    }
+
+    public void setOnState(String onState) {
+        this.onState = onState;
+    }
+
+    public String getOnState() {
+        return onState;
     }
 
     /*GETTING DATA FROM LIVE DATA ALREADY FILLED UP FROM DB QUERIES*/
@@ -85,7 +94,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public ManageRepetitionsLiveData getManaged() {
-        return managed;
+        return managedData;
     }
     
     public BookRepetitionLiveData getbookRepetitionData() {
@@ -146,11 +155,11 @@ public class NetworkViewModel extends AndroidViewModel {
         new CheckConnectionAsync().execute(myURLs.getServerUrlCheckSession(), timeout, type);
     }
 
-    public void fetchBookedHistory(String state) {
+    public void fetchBookedHistory() {
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<>();
 
-            items.put("state", state);
+            items.put("state", this.onState);
             items.put("account", usersData.getValue().getAccount());
             launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
         }
@@ -418,9 +427,9 @@ public class NetworkViewModel extends AndroidViewModel {
                 boolean isManaged = jsonObject.getBoolean("done");
 
                 if(!isManaged)
-                    managed.setValue(null);
+                    managedData.setValue(null);
                 else
-                    managed.setValue(true);
+                    managedData.setValue(true);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
