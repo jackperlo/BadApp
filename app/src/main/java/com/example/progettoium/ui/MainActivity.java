@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.progettoium.data.BookedRepetitions;
 import com.example.progettoium.data.User;
@@ -51,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
         CookieHandler.setDefault(new CookieManager());
 
-        /*it must stay here because is shared between fragments (it's the side menu)*/
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
 
         model.getRegisteredUser().observe(this, account -> {
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 //mainActivityBinding.loading.setVisibility(View.INVISIBLE);
                 int tabPosition = FragmentHomeBinding.inflate(getLayoutInflater()).tabLayout.getSelectedTabPosition();
                 model.fetchFreeRepetitions(getWeekDay(tabPosition));
+                model.setOnDay(getWeekDay(tabPosition));
             } else {
                 progressDialog.show();
                 //mainActivityBinding.loading.setVisibility(View.VISIBLE);
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 model.logoutUser();
+                model.getRegisteredUser().updateUser(new User());
                 model.getBookedRepetitions().updateBookedRepetitions(new ArrayList<>());
                 mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
                 navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
@@ -147,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 ret = "Wednesday";
                 break;
             case 3:
-                ret = "Thurday";
+                ret = "Thursday";
                 break;
             case 4:
                 ret = "Friday";

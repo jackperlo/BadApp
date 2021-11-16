@@ -1,13 +1,11 @@
 package com.example.progettoium.ui.booked;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -16,10 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentBookedBinding;
 import com.example.progettoium.ui.booked.bookedHistory.BookedHistoryCustomViewAdapter;
-import com.example.progettoium.ui.home.bookedRepetitions.BookedRepetitionsCustomViewAdapter;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
