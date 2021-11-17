@@ -50,7 +50,7 @@ public class HomeFragment extends Fragment {
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            if(user != null)
+            if(user.first != null)
                 binding.lblWelcomeMainFragment.setText("Hi, " + user.first.getName() + " " + user.first.getSurname());
             
             //TODO: aggiornare la home una volta fatto il logout
