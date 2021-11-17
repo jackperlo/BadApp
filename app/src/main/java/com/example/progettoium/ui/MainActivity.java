@@ -62,16 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
 
-        model.getRegisteredUser().observe(this, account -> {
-            if (account.first != null) {
-                TextView txtNome = findViewById(R.id.txtNameSurname);
-                TextView txtMail = findViewById(R.id.txtMail);
-
-                txtNome.setText(account.first.getName() + " " + account.first.getSurname());
-                txtMail.setText(account.first.getAccount());
-            }
-        });
-
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("SESSION", 0);
         model.setSessionToken(sharedPreferences.getString("session_token", null));
 
@@ -110,6 +100,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         model.getRegisteredUser().observe(this, user -> {
+            if (user.first != null) {
+                TextView txtNome = findViewById(R.id.txtNameSurname);
+                TextView txtMail = findViewById(R.id.txtMail);
+
+                txtNome.setText(user.first.getName() + " " + user.first.getSurname());
+                txtMail.setText(user.first.getAccount());
+            }
+
             if (user.second.equals("check session")) {
                 progressDialog.dismiss();
                 if (user.first == null) {
@@ -138,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
                 logOutOperations(navigationView, sharedPreferences, drawer);
                 Snackbar.make(this.mainActivityBinding.getRoot(), "SESSION EXPIRED", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+            } else if(user.second.equals("logout")) {
+                Snackbar.make(this.mainActivityBinding.getRoot(), "LOGOUT DONE SUCCESSFULLY", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
@@ -161,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
         editor.clear();
         editor.apply();
         drawer.closeDrawer(navigationView);
-        //TODO: avvisare che il logout è stato fatto
     }
 
     @Override

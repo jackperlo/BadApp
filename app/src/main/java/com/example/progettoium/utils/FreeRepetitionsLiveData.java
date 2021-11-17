@@ -8,6 +8,6 @@ import java.util.List;
 
 public class FreeRepetitionsLiveData extends MutableLiveData<List<FreeRepetitions>> {
     public void updateFreeRepetitions(List<FreeRepetitions> freeRepetitions) {
-        postValue(freeRepetitions);
+         postValue(freeRepetitions);
     }
 }
