@@ -1,6 +1,7 @@
 package com.example.progettoium.ui.login;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -49,23 +50,30 @@ public class LoginFragment extends Fragment {
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Connection...");
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
-            progressDialog.dismiss();
-            if(user == null) {
-                String out = getContext().getResources().getString(R.string.no_db_connection);
-                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            } else if(user.isEmpty()){
-                String out = getContext().getResources().getString(R.string.login_failed_fragment);
-                Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
-            } else {
-                NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
-                navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
-                getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
+            if(user.second.equals("login")) {
+                //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
+                progressDialog.dismiss();
+                if (user.first == null) {
+                    String out = getContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else if (user.first.isEmpty()) {
+                    String out = getContext().getResources().getString(R.string.login_failed_fragment);
+                    Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
+                } else {
+                    NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
+                    getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
 
-                networkViewModel.fetchFreeRepetitions(getWeekDay(0));
-                NavHostFragment.findNavController(LoginFragment.this)
-                        .navigate(R.id.action_nav_login_to_nav_home);
+                    SharedPreferences sharedPreferences = getContext().getSharedPreferences("SESSION", 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("session_token", user.first.getToken());
+                    editor.apply();
+
+                    networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                    NavHostFragment.findNavController(LoginFragment.this)
+                            .navigate(R.id.action_nav_login_to_nav_home);
+                }
             }
         });
 

@@ -50,11 +50,11 @@ public class HomeFragment extends Fragment {
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            if(user != null) {
-                binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
-                //TODO: aggiornare la home una volta fatto il logout
-                //networkViewModel.fetchFreeRepetitions(getWeekDay(0));
-            }
+            if(user != null)
+                binding.lblWelcomeMainFragment.setText("Hi, " + user.first.getName() + " " + user.first.getSurname());
+            
+            //TODO: aggiornare la home una volta fatto il logout
+            //networkViewModel.fetchFreeRepetitions(getWeekDay(0));
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());

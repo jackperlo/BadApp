@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.example.progettoium.data.BookedRepetitions;
@@ -52,6 +54,7 @@ public class NetworkViewModel extends AndroidViewModel {
     private final BookRepetitionLiveData bookRepetitionData;
     private String onDay="";
     private String onState="";
+    private final String SHARED_NAME = "SESSION";
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -103,8 +106,8 @@ public class NetworkViewModel extends AndroidViewModel {
     /*END GETTING DATA FROM LIVE DATA*/
 
     /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
-    /*public boolean checkSession() {
-        boolean isDone = false;
+    public void checkSession(String token) {
+        /*boolean isDone = false;
 
         if (getIsConnected().getValue()) {
             JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
@@ -122,8 +125,12 @@ public class NetworkViewModel extends AndroidViewModel {
             }
         }
 
-        return isDone;
-    }*/
+        return isDone;*/
+
+        HashMap<String, String> items = new HashMap<String, String>();
+        items.put("sessionToken", token);
+        launchThread(myURLs.getServerUrlCheckSession(), items, "POST", "check session");
+    }
 
     public void registerUser(String account, String password, String name, String surname) {
         // TODO: possibile aggiungere un controllo che guarda se esiste gia un utente con quella mail?
@@ -161,7 +168,7 @@ public class NetworkViewModel extends AndroidViewModel {
             HashMap<String, String> items = new HashMap<>();
 
             items.put("state", this.onState);
-            items.put("account", usersData.getValue().getAccount());
+            items.put("account", usersData.getValue().first.getAccount());
             launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
         }
     }
@@ -178,7 +185,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public void bookARepetition(Courses selectedCourse, Teachers selectedTeacher, String startTime){
         //launchThread(myURLs.getServerUrlBookARepetition(), items, "POST", "book");
 
-        new BookARepetition().execute(myURLs.getServerUrlBookARepetition(), String.valueOf(3000), this.onDay, startTime, String.valueOf(selectedCourse.getIDCourse()), String.valueOf(selectedTeacher.getIDTeacher()), usersData.getValue().getAccount());
+        new BookARepetition().execute(myURLs.getServerUrlBookARepetition(), String.valueOf(3000), this.onDay, startTime, String.valueOf(selectedCourse.getIDCourse()), String.valueOf(selectedTeacher.getIDTeacher()), usersData.getValue().first.getAccount());
     }
 
     public void changeRepetitionState(String newState, String day, String startTime, int idCourse, int idTeacher) {
@@ -315,11 +322,11 @@ public class NetworkViewModel extends AndroidViewModel {
                         isConnected.updateConnection(false);
 
                     if (service.equals("login") || service.equals("registration"))
-                        if(json.get().getString("error").equals("registration failed") || json.get().getString("error").equals("user not found"))
-                            usersData.updateUser(new User());
-                        else{
+                        if(json.get().getString("error").equals("registration failed") || json.get().getString("error").equals("user not found")) {
+                            usersData.updateUser(new Pair<>(new User(), service));
+                        } else{
                             //Errore sul db --> il db non è connesso...
-                            usersData.updateUser(null);
+                            usersData.updateUser(new Pair<>(null, service));
                         }
                     else if (service.equals("booked")) {
                         //Errore sul db --> il db non è connesso...
@@ -327,13 +334,20 @@ public class NetworkViewModel extends AndroidViewModel {
                     } else if(service.equals("free")){
                         //Errore sul db --> il db non è connesso...
                         freeRepetitionsData.updateFreeRepetitions(null);
+                    } else if(service.equals("check session")) {
+                        if(!json.get().getString("error").equals("no session")) {
+                            //Errore sul db --> il db non è connesso...
+                            usersData.updateUser(new Pair<>(null, service));
+                        } else
+                            usersData.updateUser(new Pair<>(new User(), service));
                     }
                 } else {
-                    if (service.equals("login"))
-                        usersData.updateUser(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
-                    else if (service.equals("registration"))
-                        usersData.updateUser(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
-                    else if (service.equals("free")) {
+                    if (service.equals("login") || service.equals("registration")) {
+                        if (service.equals("login"))
+                            usersData.updateUser(new Pair<>(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"), json.get().getString("token")), service)); // aggiorna i live data
+                        else
+                            usersData.updateUser(new Pair<>(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"), json.get().getString("token")), service)); // aggiorna i live data
+                    } else if (service.equals("free")) {
                         ArrayList<FreeRepetitions> freeRepetitions = new ArrayList<FreeRepetitions>();
                         ArrayList<Courses> courses = null;
                         ArrayList<Teachers> teachers = null;
@@ -369,7 +383,13 @@ public class NetworkViewModel extends AndroidViewModel {
                         }
                         bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
                     } else if(service.equals("logout")) {
-                        usersData.updateUser(new User());
+                        usersData.updateUser(new Pair<>(new User(), service));
+                    } else if(service.equals("check session")) {
+                        usersData.updateUser(new Pair<>(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"), json.get().getString("token")), service)); // aggiorna i live data
+                        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(this.SHARED_NAME, 0);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("session_token", json.get().getString("token"));
+                        editor.apply();
                     }
                 }
             } catch (JSONException jsonException) {
@@ -417,7 +437,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("startTime", strings[2]);
             items.put("idCourse", String.valueOf(strings[3]));
             items.put("idTeacher", String.valueOf(strings[4]));
-            items.put("account", usersData.getValue().getAccount());
+            items.put("account", usersData.getValue().first.getAccount());
 
             return sendGETRequest(myURLs.getServerUrlManageRepetitions(), items);
         }

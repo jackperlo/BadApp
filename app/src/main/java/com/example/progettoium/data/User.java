@@ -7,14 +7,16 @@ public class User {
     String name;
     String surname;
     boolean isEmpty;
+    String token;
 
     //user used for Registration
-    public User(String account, String pwd, String role, String name, String surname) {
+    public User(String account, String pwd, String role, String name, String surname, String token) {
         this.account = account;
         this.pwd = pwd;
         this.role = role;
         this.name = name;
         this.surname = surname;
+        this.token = token;
         this.isEmpty = false;
     }
 
@@ -23,15 +25,17 @@ public class User {
         this.pwd = null;
         this.role = null;
         this.name = "Guest";
+        this.token = null;
         this.surname = "";
         this.isEmpty = true;
     }
 
     //user used for Login
-    public User(String account, String name, String surname) {
+    public User(String account, String name, String surname, String token) {
         this.account = account;
         this.name = name;
         this.surname = surname;
+        this.token = token;
         this.isEmpty = false;
     }
 
@@ -53,6 +57,10 @@ public class User {
 
     public String getSurname() {
         return surname;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public boolean isEmpty() {

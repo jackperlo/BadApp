@@ -1,6 +1,7 @@
 package com.example.progettoium.ui.register;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,21 +40,28 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            progressDialog.dismiss();
-            if(user == null) {
-                String out = getContext().getResources().getString(R.string.no_db_connection);
-                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            } else if(user.isEmpty()) {
-                String out = getContext().getResources().getString(R.string.registration_failed);
-                Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
-            } else {
-                NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
-                navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
-                getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
+            if(user.second.equals("registration")) {
+                progressDialog.dismiss();
+                if (user == null) {
+                    String out = getContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else if (user.first.isEmpty()) {
+                    String out = getContext().getResources().getString(R.string.registration_failed);
+                    Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
+                } else {
+                    NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
+                    getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
 
-                networkViewModel.fetchFreeRepetitions(getWeekDay(0));
-                NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
+                    SharedPreferences sharedPreferences = getContext().getSharedPreferences("SESSION", 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("session_token", user.first.getToken());
+                    editor.apply();
+
+                    networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                    NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
+                }
             }
         });
 
