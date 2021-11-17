@@ -230,7 +230,6 @@ public class NetworkViewModel extends AndroidViewModel {
 
             conn.connect();
             int response = conn.getResponseCode();
-            Log.d("HttpURLConnection", "The response is: " + response);
             // Converti  InputStream in JSON
             return readIt(conn.getInputStream());
         } catch (Exception ex) {
@@ -270,7 +269,7 @@ public class NetworkViewModel extends AndroidViewModel {
 
             conn.connect();
             int response = conn.getResponseCode();
-            Log.d("HttpURLConnection", "The response is: " + response);
+
             // Converti  InputStream in JSON
             return readIt(conn.getInputStream());
         } catch (Exception ex) {
@@ -306,7 +305,6 @@ public class NetworkViewModel extends AndroidViewModel {
             else
                 val = null;
 
-            //TODO: quando si entra nella pagina di login arrviano dei dati dal server sulle prenotazioni
             try {
                 json.set(new JSONObject(val));
                 boolean isDone = json.get().getBoolean("done");

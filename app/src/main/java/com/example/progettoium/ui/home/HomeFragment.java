@@ -85,6 +85,7 @@ public class HomeFragment extends Fragment {
                 networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
                 networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
                 // TODO: togliere la scritta "Repetition booked successfully" quando si torna sulla home dopo aver prenotato una ripetizione
+                // TODO: vene visualizzata perchè quando si schiaccia la pagina viene fatto il bind sua su bookrepetitiondata che freerepetitondata
                 //networkViewModel.getbookRepetitionData().updateBookRepetition("");
             }
         });
