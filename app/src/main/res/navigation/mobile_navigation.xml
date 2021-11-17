@@ -9,11 +9,7 @@
         android:id="@+id/nav_home"
         android:name="com.example.progettoium.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_nav_home_to_nav_booked"
-            app:destination="@id/nav_booked" />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_login"

@@ -175,7 +175,10 @@ public class NetworkViewModel extends AndroidViewModel {
     public void fetchFreeRepetitions(String day) {
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
+        if(usersData.getValue()!=null && usersData.getValue().getAccount()!=null && usersData.getValue().getSurname()!=null && usersData.getValue().getName()!=null)
+            items.put("account", usersData.getValue().getAccount());
         launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
+
     }
 
     public void bookARepetition(Courses selectedCourse, Teachers selectedTeacher, String startTime){

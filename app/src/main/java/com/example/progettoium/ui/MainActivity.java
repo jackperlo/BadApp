@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 editor.clear();
                 editor.apply();
                 drawer.closeDrawer(navigationView);
-
                 //TODO: avvisare che il logout è stato fatto
             }
         });

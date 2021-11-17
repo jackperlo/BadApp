@@ -21,12 +21,12 @@ public class User {
     }
 
     public User() {
-        this.account = "guest@email.com";
+        this.account = null;
         this.pwd = null;
         this.role = null;
         this.name = "Guest";
-        this.surname = "Guest";
         this.token = null;
+        this.surname = "";
         this.isEmpty = true;
     }
 

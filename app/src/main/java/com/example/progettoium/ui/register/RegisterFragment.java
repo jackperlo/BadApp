@@ -149,4 +149,28 @@ public class RegisterFragment extends Fragment {
             return true;
         }
     }
+
+    private String getWeekDay(int tabValue){
+        String ret = "";
+        switch (tabValue){
+            case 0:
+                ret = "Monday";
+                break;
+            case 1:
+                ret = "Tuesday";
+                break;
+            case 2:
+                ret = "Wednesday";
+                break;
+            case 3:
+                ret = "Thursday";
+                break;
+            case 4:
+                ret = "Friday";
+                break;
+            default:
+                break;
+        }
+        return ret;
+    }
 }
