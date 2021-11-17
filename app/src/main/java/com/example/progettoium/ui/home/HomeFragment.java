@@ -64,23 +64,28 @@ public class HomeFragment extends Fragment {
             progressDialog.dismiss();
             if(courseObjects != null) {
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
-                binding.swipeRefreshLayoutBooking.setRefreshing(false);
             } else {
                 Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 ArrayList<FreeRepetitions> frep = new ArrayList<>();
                 adapter.setData(frep);
             }
+
+            binding.swipeRefreshLayoutBooking.setRefreshing(false);
         });
 
         networkViewModel.getbookRepetitionData().observe(getViewLifecycleOwner(), status -> {
             ProgressDialog pdBookARepetition = adapter.getBookARepetitionDialog();
-            if(pdBookARepetition != null)
-                pdBookARepetition.dismiss();
-            Snackbar.make(getView(), status, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
-            networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
-            // TODO: togliere la scritta "Repetition booked successfully" quando si torna sulla home dopo aver prenotato una ripetizione
-            //networkViewModel.getbookRepetitionData().updateBookRepetition("");
+            if(status.equals("no_session")) {
+                progressDialog.dismiss();
+            } else {
+                if(pdBookARepetition != null)
+                    pdBookARepetition.dismiss();
+                Snackbar.make(getView(), status, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+                networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+                // TODO: togliere la scritta "Repetition booked successfully" quando si torna sulla home dopo aver prenotato una ripetizione
+                //networkViewModel.getbookRepetitionData().updateBookRepetition("");
+            }
         });
 
         TabLayout tabLayout = binding.tabLayout;

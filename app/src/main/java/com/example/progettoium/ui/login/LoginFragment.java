@@ -51,7 +51,6 @@ public class LoginFragment extends Fragment {
         progressDialog.setMessage("Connection...");
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             if(user.second.equals("login")) {
-                //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
                 progressDialog.dismiss();
                 if (user.first == null) {
                     Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
@@ -68,6 +67,8 @@ public class LoginFragment extends Fragment {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("session_token", user.first.getToken());
                     editor.apply();
+
+                    networkViewModel.setSessionToken(user.first.getToken());
 
                     NavHostFragment.findNavController(LoginFragment.this)
                             .navigate(R.id.action_nav_login_to_nav_home);

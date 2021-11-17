@@ -55,6 +55,7 @@ public class NetworkViewModel extends AndroidViewModel {
     private String onDay="";
     private String onState="";
     private final String SHARED_NAME = "SESSION";
+    private String sessionToken="";
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -65,6 +66,10 @@ public class NetworkViewModel extends AndroidViewModel {
         isConnected = new ConnectionLiveData();
         managedData = new ManageRepetitionsLiveData();
         bookRepetitionData = new BookRepetitionLiveData();
+    }
+
+    public void setSessionToken(String sessionToken) {
+        this.sessionToken = sessionToken;
     }
 
     public void setOnDay(String onDay){
@@ -106,29 +111,9 @@ public class NetworkViewModel extends AndroidViewModel {
     /*END GETTING DATA FROM LIVE DATA*/
 
     /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
-    public void checkSession(String token) {
-        /*boolean isDone = false;
-
-        if (getIsConnected().getValue()) {
-            JSONObject json = launchThread(myURLs.getServerUrlCheckSession(), new HashMap<>(), "GET");
-
-            try {
-                isDone = json.getBoolean("done");
-
-                if (isDone)
-                    usersData.updateUser(new User(json.getString("account"), json.getString("name"), json.getString("surname")));
-                else {
-                    //TODO: non c'è connessione, cosa fare?
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return isDone;*/
-
+    public void checkSession() {
         HashMap<String, String> items = new HashMap<String, String>();
-        items.put("sessionToken", token);
+        items.put("sessionToken", sessionToken);
         launchThread(myURLs.getServerUrlCheckSession(), items, "POST", "check session");
     }
 
@@ -139,6 +124,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("password", password);
             items.put("name", name);
             items.put("surname", surname);
+            items.put("sessionToken", "");
 
             launchThread(myURLs.getServerUrlRegistration(), items, "POST", "registration");
         }
@@ -149,13 +135,16 @@ public class NetworkViewModel extends AndroidViewModel {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
+            items.put("sessionToken", "");
 
             launchThread(myURLs.getServerUrlLogin(), items, "POST", "login");
         }
     }
 
     public void logoutUser() {
-        launchThread(myURLs.getServerUrlLogin(), new HashMap<>(), "GET", "logout");
+        HashMap<String, String> items = new HashMap<>();
+        items.put("sessionToken", "");
+        launchThread(myURLs.getServerUrlLogin(), items, "GET", "logout");
     }
 
     public void testServerConnection(String timeout, String type) {
@@ -168,6 +157,7 @@ public class NetworkViewModel extends AndroidViewModel {
 
             items.put("state", this.onState);
             items.put("account", usersData.getValue().first.getAccount());
+            items.put("sessionToken", sessionToken);
             launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
         }
     }
@@ -175,8 +165,10 @@ public class NetworkViewModel extends AndroidViewModel {
     public void fetchFreeRepetitions(String day) {
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
-        if(usersData.getValue()!=null && usersData.getValue().getAccount()!=null && usersData.getValue().getSurname()!=null && usersData.getValue().getName()!=null)
-            items.put("account", usersData.getValue().getAccount());
+        items.put("sessionToken", "");
+
+        if(usersData.getValue()!=null && usersData.getValue().first.getAccount()!=null && usersData.getValue().first.getSurname()!=null && usersData.getValue().first.getName()!=null)
+            items.put("account", usersData.getValue().first.getAccount());
         launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
 
     }
@@ -228,6 +220,7 @@ public class NetworkViewModel extends AndroidViewModel {
             conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
             conn.setUseCaches(false);
             conn.setDoOutput(true);
+            conn.setRequestProperty("Cookie", "JSESSIONID=" + params.get("sessionToken"));
 
             try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
                 wr.write(postData);
@@ -272,6 +265,7 @@ public class NetworkViewModel extends AndroidViewModel {
             conn.setConnectTimeout(20000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
+            conn.setRequestProperty("Cookie", "JSESSIONID=" + params.get("sessionToken"));
 
             conn.connect();
             int response = conn.getResponseCode();
@@ -328,8 +322,12 @@ public class NetworkViewModel extends AndroidViewModel {
                             usersData.updateUser(new Pair<>(null, service));
                         }
                     else if (service.equals("booked")) {
-                        //Errore sul db --> il db non è connesso...
-                        bookedRepetitionsData.updateBookedRepetitions(null);
+                        if(json.get().getString("error").equals("no session")) {
+                            usersData.updateUser(new Pair<>(new User(), "session expired"));
+                        } else {
+                            //Errore sul db --> il db non è connesso...
+                            bookedRepetitionsData.updateBookedRepetitions(null);
+                        }
                     } else if(service.equals("free")){
                         //Errore sul db --> il db non è connesso...
                         freeRepetitionsData.updateFreeRepetitions(null);
@@ -408,6 +406,7 @@ public class NetworkViewModel extends AndroidViewModel {
 
             HashMap<String, String> param = new HashMap<>();
             param.put("type", strings[2]);
+            param.put("sessionToken", "");
             return sendGETRequest(strings[0], param);
         }
 
@@ -437,6 +436,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("idCourse", String.valueOf(strings[3]));
             items.put("idTeacher", String.valueOf(strings[4]));
             items.put("account", usersData.getValue().first.getAccount());
+            items.put("sessionToken", sessionToken);
 
             return sendGETRequest(myURLs.getServerUrlManageRepetitions(), items);
         }
@@ -448,10 +448,15 @@ public class NetworkViewModel extends AndroidViewModel {
                 jsonObject = new JSONObject(retVal);
                 boolean isManaged = jsonObject.getBoolean("done");
 
-                if(!isManaged)
-                    managedData.setValue(null);
-                else
-                    managedData.setValue(true);
+                if(isManaged) {
+                    managedData.setValue(isManaged);
+                } else {
+                    if(jsonObject.getString("error").equals("no session")) {
+                        usersData.updateUser(new Pair<>(new User(), "session expired"));
+                        managedData.setValue(false);
+                    } else
+                        managedData.setValue(null);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -473,6 +478,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("IDCourse", strings[4]);
             items.put("IDTeacher", strings[5]);
             items.put("account", strings[6]);
+            items.put("sessionToken", sessionToken);
 
             return sendPOSTRequest(strings[0], items);
         }
@@ -482,8 +488,16 @@ public class NetworkViewModel extends AndroidViewModel {
             JSONObject jsonObject;
             try {
                 jsonObject = new JSONObject(s);
-                String result = jsonObject.getString("results");
-                bookRepetitionData.setValue(result);
+
+                if(jsonObject.getBoolean("done")) {
+                    String result = jsonObject.getString("results");
+                    bookRepetitionData.setValue(result);
+                } else {
+                    if(jsonObject.getString("error").equals("no session")) {
+                        usersData.updateUser(new Pair<>(new User(), "session expired"));
+                        bookRepetitionData.setValue("no session");
+                    }
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

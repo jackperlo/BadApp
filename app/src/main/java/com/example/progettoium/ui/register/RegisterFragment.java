@@ -58,6 +58,8 @@ public class RegisterFragment extends Fragment {
                     editor.putString("session_token", user.first.getToken());
                     editor.apply();
 
+                    networkViewModel.setSessionToken(user.first.getToken());
+
                     NavHostFragment.findNavController(RegisterFragment.this)
                             .navigate(R.id.action_nav_register_to_nav_home);
                 }
