@@ -153,7 +153,10 @@ public class NetworkViewModel extends AndroidViewModel {
     public void fetchFreeRepetitions(String day) {
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
+        if(usersData.getValue()!=null && usersData.getValue().getAccount()!=null && usersData.getValue().getSurname()!=null && usersData.getValue().getName()!=null)
+            items.put("account", usersData.getValue().getAccount());
         launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
+
     }
 
     public void bookARepetition(Courses selectedCourse, Teachers selectedTeacher, String startTime){
@@ -298,12 +301,11 @@ public class NetworkViewModel extends AndroidViewModel {
                         freeRepetitionsData.updateFreeRepetitions(null);
                     }
                 } else {
-                    if (service.equals("login") || service.equals("registration")) {
-                        if (service.equals("login"))
-                            usersData.updateUser(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
-                        else
-                            usersData.updateUser(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
-                    } else if (service.equals("free")) {
+                    if (service.equals("login"))
+                        usersData.updateUser(new User(json.get().getString("account"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
+                    else if (service.equals("registration"))
+                        usersData.updateUser(new User(json.get().getString("account"), json.get().getString("pwd"), json.get().getString("role"), json.get().getString("name"), json.get().getString("surname"))); // aggiorna i live data
+                    else if (service.equals("free")) {
                         ArrayList<FreeRepetitions> freeRepetitions = new ArrayList<FreeRepetitions>();
                         ArrayList<Courses> courses = null;
                         ArrayList<Teachers> teachers = null;

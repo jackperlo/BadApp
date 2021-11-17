@@ -51,8 +51,8 @@ public class RegisterFragment extends Fragment {
                 navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
                 getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
 
-                NavHostFragment.findNavController(RegisterFragment.this)
-                        .navigate(R.id.action_nav_register_to_nav_home);
+                networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
             }
         });
 
@@ -140,5 +140,29 @@ public class RegisterFragment extends Fragment {
             retypePassword.setError(null);
             return true;
         }
+    }
+
+    private String getWeekDay(int tabValue){
+        String ret = "";
+        switch (tabValue){
+            case 0:
+                ret = "Monday";
+                break;
+            case 1:
+                ret = "Tuesday";
+                break;
+            case 2:
+                ret = "Wednesday";
+                break;
+            case 3:
+                ret = "Thursday";
+                break;
+            case 4:
+                ret = "Friday";
+                break;
+            default:
+                break;
+        }
+        return ret;
     }
 }

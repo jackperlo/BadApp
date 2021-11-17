@@ -50,8 +50,11 @@ public class HomeFragment extends Fragment {
 
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            if(user != null)
+            if(user != null) {
                 binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
+                //TODO: aggiornare la home una volta fatto il logout
+                //networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+            }
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
@@ -71,10 +74,13 @@ public class HomeFragment extends Fragment {
 
         networkViewModel.getbookRepetitionData().observe(getViewLifecycleOwner(), status -> {
             ProgressDialog pdBookARepetition = adapter.getBookARepetitionDialog();
-            pdBookARepetition.dismiss();
+            if(pdBookARepetition != null)
+                pdBookARepetition.dismiss();
             Snackbar.make(getView(), status, Snackbar.LENGTH_LONG).setAction("Action", null).show();
             networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
             networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+            // TODO: togliere la scritta "Repetition booked successfully" quando si torna sulla home dopo aver prenotato una ripetizione
+            //networkViewModel.getbookRepetitionData().updateBookRepetition("");
         });
 
         TabLayout tabLayout = binding.tabLayout;

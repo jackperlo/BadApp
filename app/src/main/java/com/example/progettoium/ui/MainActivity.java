@@ -16,6 +16,7 @@ import com.example.progettoium.data.BookedRepetitions;
 import com.example.progettoium.data.User;
 import com.example.progettoium.databinding.FragmentHomeBinding;
 import com.example.progettoium.ui.home.HomeFragment;
+import com.example.progettoium.ui.login.LoginFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.google.android.material.navigation.NavigationView;
@@ -24,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -107,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
                 navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
                 navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
                 drawer.closeDrawer(navigationView);
-
                 //TODO: avvisare che il logout è stato fatto
             }
         });
