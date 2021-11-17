@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         model.getIsConnected().observe(this, connected -> {
             if (connected) {
                 //mainActivityBinding.loading.setVisibility(View.INVISIBLE);
-
                 if(checkSession.get()) {
                     progressDialog.show();
                     model.checkSession();
@@ -109,10 +108,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (user.second.equals("check session")) {
-                progressDialog.dismiss();
+                if(progressDialog != null)
+                    progressDialog.dismiss();
+
                 if (user.first == null) {
-                    Snackbar.make(this.mainActivityBinding.getRoot(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    String out = getApplicationContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(this.mainActivityBinding.getRoot(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
                     navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
                     mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
@@ -134,11 +135,15 @@ public class MainActivity extends AppCompatActivity {
                 model.setOnDay(getWeekDay(tabPosition));
             } else if(user.second.equals("session expired")) {
                 logOutOperations(navigationView, sharedPreferences, drawer);
-                Snackbar.make(this.mainActivityBinding.getRoot(), "SESSION EXPIRED", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                String out = getApplicationContext().getResources().getString(R.string.session_expired);
+                Snackbar.make(this.mainActivityBinding.getRoot(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                model.fetchFreeRepetitions(getWeekDay(0));
+                model.setOnDay(getWeekDay(0));
             } else if(user.second.equals("logout")) {
-                Snackbar.make(this.mainActivityBinding.getRoot(), "LOGOUT DONE SUCCESSFULLY", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                String out = getApplicationContext().getResources().getString(R.string.logout_success);
+                Snackbar.make(this.mainActivityBinding.getRoot(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                model.fetchFreeRepetitions(getWeekDay(0));
+                model.setOnDay(getWeekDay(0));
             }
         });
 

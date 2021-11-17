@@ -61,6 +61,8 @@
 
     <!-- Main Activity.java -->
     <string name="connection">Connection...</string>
+    <string name="session_expired">SESSION EXPIRED</string>
+    <string name="logout_success">LOGOUT DONE SUCCESSFULLY</string>
 
     <!-- BookedFragment.java, HomeFragment.java, LoginFragment.java, RegistrationFragment.java -->
     <string name="no_db_connection">NO DATABASE CONNECTION</string>

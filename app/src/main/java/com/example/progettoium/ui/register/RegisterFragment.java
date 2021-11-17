@@ -41,7 +41,9 @@ public class RegisterFragment extends Fragment {
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             if(user.second.equals("registration")) {
-                progressDialog.dismiss();
+                if(progressDialog != null)
+                    progressDialog.dismiss();
+
                 if (user.first == null) {
                     String out = getContext().getResources().getString(R.string.no_db_connection);
                     Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -62,6 +64,7 @@ public class RegisterFragment extends Fragment {
 
                         networkViewModel.setSessionToken(user.first.getToken());
                         networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                        networkViewModel.setOnDay(getWeekDay(0));
                         NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
                     }
                 }

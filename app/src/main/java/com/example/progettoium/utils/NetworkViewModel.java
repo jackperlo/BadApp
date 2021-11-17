@@ -397,12 +397,6 @@ public class NetworkViewModel extends AndroidViewModel {
     public class CheckConnectionAsync extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
-            try {
-                Thread.sleep(Integer.parseInt(strings[1]));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
             HashMap<String, String> param = new HashMap<>();
             param.put("type", strings[2]);
             param.put("sessionToken", "");

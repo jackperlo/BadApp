@@ -95,7 +95,8 @@ public class BookedFragment extends Fragment {
         });
 
         networkViewModel.getManaged().observe(getViewLifecycleOwner(), manged -> {
-            adapter.progressDialog.dismiss();
+            if(adapter.progressDialog != null)
+                adapter.progressDialog.dismiss();
             if(manged == null) {
                 String out = getContext().getResources().getString(R.string.no_db_connection);
                 Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
