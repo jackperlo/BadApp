@@ -58,7 +58,7 @@ public class HomeFragment extends Fragment {
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Connection...");
+        progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
         progressDialog.show();
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             progressDialog.dismiss();
@@ -66,7 +66,8 @@ public class HomeFragment extends Fragment {
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
                 binding.swipeRefreshLayoutBooking.setRefreshing(false);
             } else {
-                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                String out = getContext().getResources().getString(R.string.no_db_connection);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 ArrayList<FreeRepetitions> frep = new ArrayList<>();
                 adapter.setData(frep);
             }

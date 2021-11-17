@@ -126,6 +126,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }*/
 
     public void registerUser(String account, String password, String name, String surname) {
+        // TODO: possibile aggiungere un controllo che guarda se esiste gia un utente con quella mail?
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);

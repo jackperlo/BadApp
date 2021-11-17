@@ -45,10 +45,6 @@
     <string name="register">Register</string>
     <string name="sign_up_to_continue">Sign Up to continue</string>
 
-    <!-- HomeFragment.java -->
-    <string name="select_teacher">Select Teacher</string>
-    <string name="select_course">Select Course</string>
-
     <!--Booked Repetitions-->
     <string name="my_reservations">My Reservations</string>
     <string name="active">Active</string>
@@ -58,4 +54,22 @@
     <string name="log_out">Log out</string>
     <string name="cancelled">Cancelled</string>
     <string name="susteined">Susteined?</string>
+
+    <!-- HomeFragment.java -->
+    <string name="select_teacher">Select Teacher</string>
+    <string name="select_course">Select Course</string>
+
+    <!-- Main Activity.java -->
+    <string name="connection">Connection...</string>
+
+    <!-- BookedFragment.java, HomeFragment.java, LoginFragment.java, RegistrationFragment.java -->
+    <string name="no_db_connection">NO DATABASE CONNECTION</string>
+
+    <!-- RegistrationFragment.java -->
+    <string name="registration_failed">Registration failed! Try Again!</string>
+
+    <!-- LoginFragment.java -->
+    <string name="login_failed_fragment">Login Failed! Try Again</string>
+
+
 </resources>

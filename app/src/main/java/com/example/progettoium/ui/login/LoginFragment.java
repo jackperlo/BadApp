@@ -52,10 +52,11 @@ public class LoginFragment extends Fragment {
             //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
             progressDialog.dismiss();
             if(user == null) {
-                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                String out = getContext().getResources().getString(R.string.no_db_connection);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
             } else if(user.isEmpty()){
-                Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
+                String out = getContext().getResources().getString(R.string.login_failed_fragment);
+                Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
             } else {
                 NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                 navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);

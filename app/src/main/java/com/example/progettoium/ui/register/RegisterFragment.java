@@ -36,15 +36,16 @@ public class RegisterFragment extends Fragment {
 
         //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Connection...");
+        progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             progressDialog.dismiss();
             if(user == null) {
-                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                String out = getContext().getResources().getString(R.string.no_db_connection);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
             } else if(user.isEmpty()) {
-                Toast.makeText(getContext(), "Registration failed! Try Again!", Toast.LENGTH_LONG).show();
+                String out = getContext().getResources().getString(R.string.registration_failed);
+                Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
             } else {
                 NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                 navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
