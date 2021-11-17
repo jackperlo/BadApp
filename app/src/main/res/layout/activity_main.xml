@@ -8,6 +8,18 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="235dp"
+        android:layout_height="395dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.634" />
+
     <include
         android:id="@+id/app_bar_main"
         layout="@layout/app_bar_main"
@@ -24,5 +36,20 @@
         app:itemIconTint="@color/TEXT"
         app:itemShapeFillColor="@color/white"
         app:itemTextColor="@color/TEXT"
-        app:menu="@menu/activity_main_drawer" />
+        app:menu="@menu/activity_main_drawer">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <Button
+                android:id="@+id/btnLogOut"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/MAIN_COLOR"
+                android:text="@string/log_out" />
+        </LinearLayout>
+    </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

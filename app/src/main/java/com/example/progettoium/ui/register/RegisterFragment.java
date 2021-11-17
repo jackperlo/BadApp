@@ -1,5 +1,7 @@
 package com.example.progettoium.ui.register;
 
+import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentRegisterBinding;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 public class RegisterFragment extends Fragment {
 
@@ -31,24 +35,46 @@ public class RegisterFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
+        //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
+
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            if(user.second.equals("registration")) {
+                progressDialog.dismiss();
+                if (user == null) {
+                    String out = getContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else if (user.first.isEmpty()) {
+                    String out = getContext().getResources().getString(R.string.registration_failed);
+                    Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
+                } else {
+                    NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
+                    getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
+
+                    SharedPreferences sharedPreferences = getContext().getSharedPreferences("SESSION", 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("session_token", user.first.getToken());
+                    editor.apply();
+
+                    networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                    NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
+                }
+            }
+        });
+
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateSurname(binding.surname) && validateName(binding.name) && validateEmail(binding.email) && validatePassword(binding.password)) {
+                if (validateSurname(binding.surname) && validateName(binding.name) && validateEmail(binding.email) && validatePassword(binding.password)) {
                     String password = binding.password.getText().toString();
-                    if(valideteRetypePassword(binding.retypePassword, password)) {
-                        binding.loading.setVisibility(View.VISIBLE);
-
+                    if (valideteRetypePassword(binding.retypePassword, password)) {
                         // N.B. Gli Admin vanno aggiunti direttamente dal phpmyadmin!
                         //QUI TUTTE LE REGISTRAZIONI SONO DI ROLE 'CLIENT'
-
-                        if (networkViewModel.registerUser(binding.email.getText().toString(), password, binding.name.getText().toString(), binding.surname.getText().toString())) {
-                            NavHostFragment.findNavController(RegisterFragment.this)
-                                    .navigate(R.id.action_nav_register_to_nav_home);
-                        } else {
-                            binding.loading.setVisibility(View.INVISIBLE);
-                            Toast.makeText(getContext(), "Registration failed! Try Again!", Toast.LENGTH_LONG).show();
-                        }
+                        progressDialog.show();
+                        networkViewModel.registerUser(binding.email.getText().toString(), password, binding.name.getText().toString(), binding.surname.getText().toString());
                     }
                 }
             }
@@ -59,7 +85,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateSurname(EditText surname) {
         String val = surname.getText().toString();
-        if(val.isEmpty()) {
+        if (val.isEmpty()) {
             surname.setError("Field cannot be empty");
             return false;
         } else {
@@ -71,7 +97,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateName(EditText name) {
         String val = name.getText().toString();
-        if(val.isEmpty()) {
+        if (val.isEmpty()) {
             name.setError("Field cannot be empty");
             return false;
         } else {
@@ -116,12 +142,36 @@ public class RegisterFragment extends Fragment {
     private boolean valideteRetypePassword(EditText retypePassword, String password) {
         String val = retypePassword.getText().toString();
 
-        if(!val.equals(password)){
+        if (!val.equals(password)) {
             retypePassword.setError("Password must be equals");
             return false;
         } else {
             retypePassword.setError(null);
             return true;
         }
+    }
+
+    private String getWeekDay(int tabValue){
+        String ret = "";
+        switch (tabValue){
+            case 0:
+                ret = "Monday";
+                break;
+            case 1:
+                ret = "Tuesday";
+                break;
+            case 2:
+                ret = "Wednesday";
+                break;
+            case 3:
+                ret = "Thursday";
+                break;
+            case 4:
+                ret = "Friday";
+                break;
+            default:
+                break;
+        }
+        return ret;
     }
 }

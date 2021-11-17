@@ -13,8 +13,8 @@
             android:icon="@drawable/user"
             android:title="@string/menu_login" />
         <item
-            android:id="@+id/nav_booking"
+            android:id="@+id/nav_booked"
             android:icon="@drawable/booking"
-            android:title="@string/le_mie_prenotazioni" />
+            android:title="@string/my_reservations" />
     </group>
 </menu>

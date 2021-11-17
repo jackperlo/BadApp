@@ -5,12 +5,19 @@ public class Teachers {
     String mail;
     String name;
     String surname;
+    String fullName;
 
     public Teachers(int IDTeacher, String mail, String name, String surname) {
         this.IDTeacher = IDTeacher;
         this.mail = mail;
         this.name = name;
         this.surname = surname;
+    }
+
+    //used while retrieving data for free repetitions (networkViewModel.fetchFreeRepetitions())
+    public Teachers(int IDTeacher, String name, String surname) {
+        this.IDTeacher = IDTeacher;
+        this.fullName = name + " " + surname;
     }
 
     public int getIDTeacher() {
@@ -27,5 +34,13 @@ public class Teachers {
 
     public String getSurname() {
         return surname;
+    }
+
+    public String getFullName(){ return fullName; }
+
+    //used from the spinner to show the full names
+    @Override
+    public String toString() {
+        return fullName;
     }
 }

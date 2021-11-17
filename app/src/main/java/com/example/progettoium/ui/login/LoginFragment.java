@@ -1,5 +1,7 @@
 package com.example.progettoium.ui.login;
 
+import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import com.example.progettoium.utils.NetworkViewModel;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentLoginBinding;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 public class LoginFragment extends Fragment {
 
@@ -34,6 +37,8 @@ public class LoginFragment extends Fragment {
 
         networkViewModel = new ViewModelProvider(requireActivity()).get(NetworkViewModel.class);
 
+        networkViewModel.testServerConnection("0", "check_connection_server");
+
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,20 +47,42 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Connection...");
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            if(user.second.equals("login")) {
+                //TODO: se si passa dal login alla registration senza connessione al db vengono presentati entrambi i tost perchè osservano la stessa variabile
+                progressDialog.dismiss();
+                if (user.first == null) {
+                    String out = getContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else if (user.first.isEmpty()) {
+                    String out = getContext().getResources().getString(R.string.login_failed_fragment);
+                    Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
+                } else {
+                    NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
+                    getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
+
+                    SharedPreferences sharedPreferences = getContext().getSharedPreferences("SESSION", 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("session_token", user.first.getToken());
+                    editor.apply();
+
+                    networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                    NavHostFragment.findNavController(LoginFragment.this)
+                            .navigate(R.id.action_nav_login_to_nav_home);
+                }
+            }
+        });
+
         binding.signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateEmail(binding.email) && validatePassword(binding.password)) {
-                    if(networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString())){
-                        NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
-                        navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                        navigationView.getMenu().findItem(R.id.nav_booking).setVisible(true);
-
-                        NavHostFragment.findNavController(LoginFragment.this)
-                                .navigate(R.id.action_nav_login_to_nav_home);
-                    } else {
-                        Toast.makeText(getContext(), "Login Failed! T ry Again", Toast.LENGTH_LONG).show();
-                    }
+                if (validateEmail(binding.email) && validatePassword(binding.password)) {
+                    progressDialog.show();
+                    networkViewModel.loginUser(binding.email.getText().toString(), binding.password.getText().toString());
                 }
             }
         });
@@ -94,5 +121,29 @@ public class LoginFragment extends Fragment {
             password.setError(null);
             return true;
         }
+    }
+
+    private String getWeekDay(int tabValue){
+        String ret = "";
+        switch (tabValue){
+            case 0:
+                ret = "Monday";
+                break;
+            case 1:
+                ret = "Tuesday";
+                break;
+            case 2:
+                ret = "Wednesday";
+                break;
+            case 3:
+                ret = "Thursday";
+                break;
+            case 4:
+                ret = "Friday";
+                break;
+            default:
+                break;
+        }
+        return ret;
     }
 }
