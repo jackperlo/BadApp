@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import com.example.progettoium.R;
 import com.example.progettoium.databinding.FragmentBookedBinding;
 import com.example.progettoium.ui.booked.bookedHistory.BookedHistoryCustomViewAdapter;
+import com.example.progettoium.ui.login.LoginFragment;
 import com.example.progettoium.utils.NetworkViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -59,6 +61,13 @@ public class BookedFragment extends Fragment {
             }
         });
 
+        networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
+            if(user.second.equals("session expired")) {
+                NavHostFragment.findNavController(BookedFragment.this)
+                        .navigate(R.id.action_nav_booked_to_nav_home);
+            }
+        });
+
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -86,7 +95,8 @@ public class BookedFragment extends Fragment {
         });
 
         networkViewModel.getManaged().observe(getViewLifecycleOwner(), manged -> {
-            adapter.progressDialog.dismiss();
+            if(adapter.progressDialog != null)
+                adapter.progressDialog.dismiss();
             if(manged == null) {
                 String out = getContext().getResources().getString(R.string.no_db_connection);
                 Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();

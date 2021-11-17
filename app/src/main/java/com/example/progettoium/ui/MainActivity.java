@@ -39,6 +39,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,21 +55,15 @@ public class MainActivity extends AppCompatActivity {
         mainActivityBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mainActivityBinding.getRoot());
 
-        //CookieHandler.setDefault(new CookieManager());
+        AtomicReference<Boolean> checkSession = new AtomicReference<>();
+        checkSession.set(true);
+
+        CookieHandler.setDefault(new CookieManager());
 
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
 
-        model.getRegisteredUser().observe(this, account -> {
-            if (account.first != null) {
-                TextView txtNome = findViewById(R.id.txtNameSurname);
-                TextView txtMail = findViewById(R.id.txtMail);
-
-                txtNome.setText(account.first.getName() + " " + account.first.getSurname());
-                txtMail.setText(account.first.getAccount());
-            }
-        });
-
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("SESSION", 0);
+        model.setSessionToken(sharedPreferences.getString("session_token", null));
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
         DrawerLayout drawer = mainActivityBinding.drawerLayout;
@@ -91,9 +86,11 @@ public class MainActivity extends AppCompatActivity {
         model.getIsConnected().observe(this, connected -> {
             if (connected) {
                 //mainActivityBinding.loading.setVisibility(View.INVISIBLE);
-
-                progressDialog.show();
-                model.checkSession(sharedPreferences.getString("session_token", null));
+                if(checkSession.get()) {
+                    progressDialog.show();
+                    model.checkSession();
+                    checkSession.set(false);
+                }
             } else {
                 progressDialog.show();
                 //mainActivityBinding.loading.setVisibility(View.VISIBLE);
@@ -102,11 +99,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         model.getRegisteredUser().observe(this, user -> {
+            if (user.first != null) {
+                TextView txtNome = findViewById(R.id.txtNameSurname);
+                TextView txtMail = findViewById(R.id.txtMail);
+
+                txtNome.setText(user.first.getName() + " " + user.first.getSurname());
+                txtMail.setText(user.first.getAccount());
+            }
+
             if (user.second.equals("check session")) {
-                progressDialog.dismiss();
+                if(progressDialog != null)
+                    progressDialog.dismiss();
+
                 if (user.first == null) {
-                    Snackbar.make(this.mainActivityBinding.getRoot(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    String out = getApplicationContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(this.mainActivityBinding.getRoot(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
                     navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
                     mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
@@ -126,25 +133,40 @@ public class MainActivity extends AppCompatActivity {
                 int tabPosition = FragmentHomeBinding.inflate(getLayoutInflater()).tabLayout.getSelectedTabPosition();
                 model.fetchFreeRepetitions(getWeekDay(tabPosition));
                 model.setOnDay(getWeekDay(tabPosition));
+            } else if(user.second.equals("session expired")) {
+                logOutOperations(navigationView, sharedPreferences, drawer);
+                String out = getApplicationContext().getResources().getString(R.string.session_expired);
+                Snackbar.make(this.mainActivityBinding.getRoot(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                model.fetchFreeRepetitions(getWeekDay(0));
+                model.setOnDay(getWeekDay(0));
+            } else if(user.second.equals("logout")) {
+                String out = getApplicationContext().getResources().getString(R.string.logout_success);
+                Snackbar.make(this.mainActivityBinding.getRoot(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                model.fetchFreeRepetitions(getWeekDay(0));
+                model.setOnDay(getWeekDay(0));
             }
         });
 
         mainActivityBinding.btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                model.logoutUser();
-                model.getRegisteredUser().updateUser(new Pair<>(new User(), ""));
-                model.getBookedRepetitions().updateBookedRepetitions(new ArrayList<>());
-                mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
-                navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
-                navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.clear();
-                editor.apply();
-                drawer.closeDrawer(navigationView);
-                //TODO: avvisare che il logout è stato fatto
+                logOutOperations(navigationView, sharedPreferences, drawer);
             }
         });
+    }
+
+    private void logOutOperations(NavigationView navigationView, SharedPreferences sharedPreferences, DrawerLayout drawer) {
+        model.logoutUser();
+        model.getRegisteredUser().updateUser(new Pair<>(new User(), ""));
+        model.getBookedRepetitions().updateBookedRepetitions(new ArrayList<>());
+        mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
+        navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+        model.setSessionToken("");
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        drawer.closeDrawer(navigationView);
     }
 
     @Override

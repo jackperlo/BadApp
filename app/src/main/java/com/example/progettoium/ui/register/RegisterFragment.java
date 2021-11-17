@@ -41,26 +41,32 @@ public class RegisterFragment extends Fragment {
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             if(user.second.equals("registration")) {
-                progressDialog.dismiss();
-                if (user == null) {
+                if(progressDialog != null)
+                    progressDialog.dismiss();
+
+                if (user.first == null) {
                     String out = getContext().getResources().getString(R.string.no_db_connection);
                     Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                } else if (user.first.isEmpty()) {
-                    String out = getContext().getResources().getString(R.string.registration_failed);
-                    Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
                 } else {
-                    NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
-                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                    navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
-                    getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
+                    if (user.first.isEmpty()) {
+                        String out = getContext().getResources().getString(R.string.registration_failed);
+                        Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
+                    }else {
+                        NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                        navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                        navigationView.getMenu().findItem(R.id.nav_booked).setVisible(true);
+                        getActivity().findViewById(R.id.btnLogOut).setVisibility(View.VISIBLE);
 
-                    SharedPreferences sharedPreferences = getContext().getSharedPreferences("SESSION", 0);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("session_token", user.first.getToken());
-                    editor.apply();
+                        SharedPreferences sharedPreferences = getContext().getSharedPreferences("SESSION", 0);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("session_token", user.first.getToken());
+                        editor.apply();
 
-                    networkViewModel.fetchFreeRepetitions(getWeekDay(0));
-                    NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
+                        networkViewModel.setSessionToken(user.first.getToken());
+                        networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+                        networkViewModel.setOnDay(getWeekDay(0));
+                        NavHostFragment.findNavController(RegisterFragment.this).navigate(R.id.action_nav_register_to_nav_home);
+                    }
                 }
             }
         });
@@ -124,14 +130,13 @@ public class RegisterFragment extends Fragment {
 
     private boolean validatePassword(EditText password) {
         String val = password.getText().toString();
-        String passwordVal =
-                "(.*[0-9])";  //at least 1 numeric
+        String passwordVal = "^(?=.*?[a-z].*?[a-z].*?[a-z])(?=.*?[\\d]).*$";  //at least 1 digit and 3 general character
 
         if (val.isEmpty()) {
             password.setError("Field cannot be empty");
             return false;
         } else if (!val.matches(passwordVal)) {
-            password.setError("Password must contain at least 1 numeric character");
+            password.setError("Password must contain at least 1 digit and 3 characters lowercase");
             return false;
         } else {
             password.setError(null);

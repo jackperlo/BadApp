@@ -33,7 +33,6 @@ public class HomeFragment extends Fragment {
 
     private NetworkViewModel networkViewModel;
     private FragmentHomeBinding binding;
-
     FreeRepetitionsCustomViewAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,43 +47,51 @@ public class HomeFragment extends Fragment {
         adapter = new FreeRepetitionsCustomViewAdapter(getContext(), new ArrayList<>(), networkViewModel);
         recyclerView.setAdapter(adapter);
 
+        TabLayout tabLayout = binding.tabLayout;
+
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            if(user != null)
+            if(user.first != null)
                 binding.lblWelcomeMainFragment.setText("Hi, " + user.first.getName() + " " + user.first.getSurname());
-            
-            //TODO: aggiornare la home una volta fatto il logout
-            //networkViewModel.fetchFreeRepetitions(getWeekDay(0));
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
         progressDialog.show();
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
-            progressDialog.dismiss();
+            if(progressDialog != null)
+                progressDialog.dismiss();
+
             if(courseObjects != null) {
                 adapter.setData(courseObjects);  // setta i dati nella recyclerView
-                binding.swipeRefreshLayoutBooking.setRefreshing(false);
             } else {
                 String out = getContext().getResources().getString(R.string.no_db_connection);
                 Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 ArrayList<FreeRepetitions> frep = new ArrayList<>();
                 adapter.setData(frep);
             }
+
+            binding.swipeRefreshLayoutBooking.setRefreshing(false);
         });
 
         networkViewModel.getbookRepetitionData().observe(getViewLifecycleOwner(), status -> {
-            ProgressDialog pdBookARepetition = adapter.getBookARepetitionDialog();
-            if(pdBookARepetition != null)
-                pdBookARepetition.dismiss();
-            Snackbar.make(getView(), status, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
-            networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
-            // TODO: togliere la scritta "Repetition booked successfully" quando si torna sulla home dopo aver prenotato una ripetizione
-            //networkViewModel.getbookRepetitionData().updateBookRepetition("");
-        });
+            if(status != null){
+                if(status.equals("no_session")) {
+                    if(progressDialog != null)
+                        progressDialog.dismiss();
+                } else {
+                    ProgressDialog pdBookARepetition = adapter.getBookARepetitionDialog();
+                    if(pdBookARepetition != null)
+                        pdBookARepetition.dismiss();
 
-        TabLayout tabLayout = binding.tabLayout;
+                    Snackbar.make(getView(), status, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+                    networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+                }
+            }
+        });
+        networkViewModel.getbookRepetitionData().setValue(null);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
