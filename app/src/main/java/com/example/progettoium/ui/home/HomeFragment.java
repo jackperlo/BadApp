@@ -58,7 +58,7 @@ public class HomeFragment extends Fragment {
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Connessione...");
+        progressDialog.setMessage("Connection...");
         progressDialog.show();
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             progressDialog.dismiss();

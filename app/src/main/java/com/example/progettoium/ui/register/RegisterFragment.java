@@ -36,7 +36,7 @@ public class RegisterFragment extends Fragment {
 
         //getActivity().findViewById(R.id.loading).setVisibility(View.VISIBLE);
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Connessione...");
+        progressDialog.setMessage("Connection...");
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             progressDialog.dismiss();

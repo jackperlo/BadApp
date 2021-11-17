@@ -1,6 +1,9 @@
 package com.example.progettoium.ui.booked.bookedHistory;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progettoium.R;
 import com.example.progettoium.data.BookedRepetitions;
+import com.example.progettoium.utils.NetworkViewModel;
 
 import java.util.List;
 import java.util.Locale;
@@ -22,10 +26,13 @@ import java.util.Locale;
 public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedHistoryCustomViewAdapter.ViewHolder> {
     private List<BookedRepetitions> mData;
     private LayoutInflater mIflater;
+    private NetworkViewModel networkViewModel;
+    public ProgressDialog progressDialog;
 
-    public BookedHistoryCustomViewAdapter(Context context, List<BookedRepetitions> data) {
+    public BookedHistoryCustomViewAdapter(Context context, List<BookedRepetitions> data, NetworkViewModel networkViewModel) {
         this.mIflater = LayoutInflater.from(context);
         this.mData = data;
+        this.networkViewModel = networkViewModel;
     }
 
     @Override
@@ -47,6 +54,14 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
 
             holder.lbl_TeacherDisplayer.setText(String.valueOf(course.getTitle()));
             holder.lbl_CourseDisplayer.setText(String.valueOf(course.getSurname() + " " + course.getName()));
+
+            if(networkViewModel.getOnState().equals("Active")) {
+                holder.btn_sustained.setVisibility(View.VISIBLE);
+                holder.btn_cancel.setVisibility(View.VISIBLE);
+            } else {
+                holder.btn_sustained.setVisibility(View.INVISIBLE);
+                holder.btn_cancel.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -55,13 +70,14 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
         return mData.size();
     }
 
-    public class  ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+    public class  ViewHolder extends RecyclerView.ViewHolder implements AdapterView.OnItemSelectedListener {
         TextView lbl_CourseStartTime;
         TextView lbl_CourseEndTime;
         TextView lbl_CourseDisplayer;
         TextView lbl_TeacherDisplayer;
         TextView lbl_Day;
         Button btn_cancel;
+        Button btn_sustained;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -71,12 +87,49 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             lbl_TeacherDisplayer = itemView.findViewById(R.id.lbl_TeacherDisplayer);
             lbl_Day = itemView.findViewById(R.id.lbl_Day);
             btn_cancel = itemView.findViewById(R.id.btn_cancel);
-            btn_cancel.setOnClickListener(this);
-        }
 
-        @Override
-        public void onClick(View view) {
-            Toast.makeText(view.getContext(),"CLICK: "+getAdapterPosition(),Toast.LENGTH_LONG).show();
+            btn_cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AlertDialog.Builder(itemView.getContext())
+                            .setTitle("Attention!")
+                            .setMessage("Are you sure you want to cancel this booking?")
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    progressDialog = new ProgressDialog(mIflater.getContext());
+                                    progressDialog.setMessage("Connection...");
+                                    progressDialog.show();
+                                    BookedRepetitions choose = mData.get(getAdapterPosition());
+                                    networkViewModel.changeRepetitionState("Cancelled", choose.getDay(), choose.getStartTime(), choose.getIdCourse(), choose.getIdTeacher());
+                                }
+                            })
+                            .setNegativeButton("CANCEL", null)
+                            .show();
+                }
+            });
+
+            btn_sustained = itemView.findViewById(R.id.btn_susteined);
+            btn_sustained.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AlertDialog.Builder(itemView.getContext())
+                            .setTitle("Attention!")
+                            .setMessage("Are you sure you want to mark this lesson as sustained?")
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    progressDialog = new ProgressDialog(mIflater.getContext());
+                                    progressDialog.setMessage("Connection...");
+                                    progressDialog.show();
+                                    BookedRepetitions choose = mData.get(getAdapterPosition());
+                                    networkViewModel.changeRepetitionState("Done", choose.getDay(), choose.getStartTime(), choose.getIdCourse(), choose.getIdTeacher());
+                                }
+                            })
+                            .setNegativeButton("CANCEL", null)
+                            .show();
+                }
+            });
         }
 
         @Override

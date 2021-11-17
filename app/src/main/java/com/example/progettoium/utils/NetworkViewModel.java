@@ -48,8 +48,10 @@ public class NetworkViewModel extends AndroidViewModel {
     private final FreeRepetitionsLiveData freeRepetitionsData;
     private final BookedRepetitionsLiveData bookedRepetitionsData;
     private final ConnectionLiveData isConnected;
+    private final ManageRepetitionsLiveData managedData;
     private final BookRepetitionLiveData bookRepetitionData;
     private String onDay="";
+    private String onState="";
 
     public NetworkViewModel(Application application) {
         super(application);
@@ -58,11 +60,20 @@ public class NetworkViewModel extends AndroidViewModel {
         freeRepetitionsData = new FreeRepetitionsLiveData();
         bookedRepetitionsData = new BookedRepetitionsLiveData();
         isConnected = new ConnectionLiveData();
+        managedData = new ManageRepetitionsLiveData();
         bookRepetitionData = new BookRepetitionLiveData();
     }
 
     public void setOnDay(String onDay){
         this.onDay = onDay;
+    }
+
+    public void setOnState(String onState) {
+        this.onState = onState;
+    }
+
+    public String getOnState() {
+        return onState;
     }
 
     /*GETTING DATA FROM LIVE DATA ALREADY FILLED UP FROM DB QUERIES*/
@@ -82,6 +93,10 @@ public class NetworkViewModel extends AndroidViewModel {
         return isConnected;
     }
 
+    public ManageRepetitionsLiveData getManaged() {
+        return managedData;
+    }
+    
     public BookRepetitionLiveData getbookRepetitionData() {
         return bookRepetitionData;
     }
@@ -140,11 +155,11 @@ public class NetworkViewModel extends AndroidViewModel {
         new CheckConnectionAsync().execute(myURLs.getServerUrlCheckSession(), timeout, type);
     }
 
-    public void fetchBookedHistory(String state) {
+    public void fetchBookedHistory() {
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<>();
 
-            items.put("state", state);
+            items.put("state", this.onState);
             items.put("account", usersData.getValue().getAccount());
             launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
         }
@@ -164,8 +179,20 @@ public class NetworkViewModel extends AndroidViewModel {
 
         new BookARepetition().execute(myURLs.getServerUrlBookARepetition(), String.valueOf(3000), this.onDay, startTime, String.valueOf(selectedCourse.getIDCourse()), String.valueOf(selectedTeacher.getIDTeacher()), usersData.getValue().getAccount());
     }
-    /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
 
+    public void changeRepetitionState(String newState, String day, String startTime, int idCourse, int idTeacher) {
+        /*HashMap<String, String> items = new HashMap<>();
+        items.put("newState", newState);
+        items.put("day", day);
+        items.put("startTime", startTime);
+        items.put("idCourse", String.valueOf(idCourse));
+        items.put("idTeacher", String.valueOf(idTeacher));
+        items.put("account", usersData.getValue().getAccount());*/
+        new ManageBookedRepetition().execute(newState, day, startTime, String.valueOf(idCourse), String.valueOf(idTeacher));
+        //launchThread(myURLs.getServerUrlManageRepetitions(), items, "GET", "change_state");
+    }
+
+    /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
 
     /*utility methods*/
     private String sendPOSTRequest(String urlServer, HashMap<String, String> params) {
@@ -336,7 +363,7 @@ public class NetworkViewModel extends AndroidViewModel {
                         JSONArray jsonArray = json.get().getJSONArray("results");
                         for (int i = 0; i < jsonArray.length(); ++i) {
                             JSONObject jsonItem = jsonArray.getJSONObject(i);
-                            BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"));
+                            BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"), jsonItem.getInt("idCourse"), jsonItem.getInt("idTeacher"));
                             bookedRepetitions.add(item);
                         }
                         bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
@@ -372,6 +399,39 @@ public class NetworkViewModel extends AndroidViewModel {
                 boolean connection = jsonObject.getBoolean("done");
 
                 isConnected.setValue(connection);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class ManageBookedRepetition extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            HashMap<String, String> items = new HashMap<>();
+            /*newState, day, startTime, String.valueOf(idCourse), String.valueOf(idTeacher)*/
+            items.put("newState", strings[0]);
+            items.put("day", strings[1]);
+            items.put("startTime", strings[2]);
+            items.put("idCourse", String.valueOf(strings[3]));
+            items.put("idTeacher", String.valueOf(strings[4]));
+            items.put("account", usersData.getValue().getAccount());
+
+            return sendGETRequest(myURLs.getServerUrlManageRepetitions(), items);
+        }
+
+        @Override
+        protected void onPostExecute(String retVal) {
+            JSONObject jsonObject;
+            try {
+                jsonObject = new JSONObject(retVal);
+                boolean isManaged = jsonObject.getBoolean("done");
+
+                if(!isManaged)
+                    managedData.setValue(null);
+                else
+                    managedData.setValue(true);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         //mainActivityBinding.loading.setVisibility(View.VISIBLE);
         ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Connessione...");
+        progressDialog.setMessage("Connection...");
         progressDialog.show();
         model.testServerConnection("0", "check_connection_server");
         model.getIsConnected().observe(this, connected -> {

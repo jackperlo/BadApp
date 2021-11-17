@@ -112,7 +112,7 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
         public void onClick(View view) {
             networkViewModel.bookARepetition(selectedCourse, selectedTeacher, (String) lbl_CourseStartTime.getText());
             bookARepetitionDialog = new ProgressDialog(mInflater.getContext());
-            bookARepetitionDialog.setMessage("Connessione...");
+            bookARepetitionDialog.setMessage("Connection...");
             bookARepetitionDialog.show();
         }
 
