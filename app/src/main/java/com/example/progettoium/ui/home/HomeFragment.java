@@ -51,7 +51,7 @@ public class HomeFragment extends Fragment {
         /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             if(user != null)
-                binding.lblWelcomeMainFragment.setText("Hi, " + user.getName() + " " + user.getSurname());
+                binding.lblWelcomeMainFragment.setText("Hi, " + user.first.getName() + " " + user.first.getSurname());
         });
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());

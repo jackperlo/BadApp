@@ -154,7 +154,7 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
                 selectedTeacher = (Teachers) parent.getSelectedItem();
                 //Toast.makeText(mInflater.getContext(), "Teacher ID: "+teacher.getIDTeacher()+", Teacher : "+teacher.getFullName(), Toast.LENGTH_SHORT).show();
                 if(selectedTeacher.getIDTeacher() != -1){
-                    User loggedUser =  networkViewModel.getRegisteredUser().getValue();
+                    User loggedUser =  networkViewModel.getRegisteredUser().getValue().first;
                     if(loggedUser != null && loggedUser.getAccount() != null && loggedUser.getSurname() != null && loggedUser.getName() != null)
                         btn_bookLesson.setVisibility(View.VISIBLE);
                 }else{
