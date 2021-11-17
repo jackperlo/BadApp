@@ -55,7 +55,8 @@ public class BookedFragment extends Fragment {
                 adapter.setData(courseObjects);
                 binding.swipeRefreshLayoutBooked.setRefreshing(false);
             } else {
-                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
+                String out = getContext().getResources().getString(R.string.no_db_connection);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -96,7 +97,8 @@ public class BookedFragment extends Fragment {
         networkViewModel.getManaged().observe(getViewLifecycleOwner(), manged -> {
             adapter.progressDialog.dismiss();
             if(manged == null) {
-                Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                String out = getContext().getResources().getString(R.string.no_db_connection);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
             } else if (manged){
                 networkViewModel.fetchBookedHistory();
             }

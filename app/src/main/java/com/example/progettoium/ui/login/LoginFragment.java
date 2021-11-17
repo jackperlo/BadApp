@@ -53,10 +53,11 @@ public class LoginFragment extends Fragment {
             if(user.second.equals("login")) {
                 progressDialog.dismiss();
                 if (user.first == null) {
-                    Snackbar.make(getView(), "NO DATABASE CONNECTION", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    String out = getContext().getResources().getString(R.string.no_db_connection);
+                    Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 } else if (user.first.isEmpty()) {
-                    Toast.makeText(getContext(), "Login Failed! Try Again", Toast.LENGTH_LONG).show();
+                    String out = getContext().getResources().getString(R.string.login_failed_fragment);
+                    Toast.makeText(getContext(), out, Toast.LENGTH_LONG).show();
                 } else {
                     NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
                     navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
@@ -70,6 +71,7 @@ public class LoginFragment extends Fragment {
 
                     networkViewModel.setSessionToken(user.first.getToken());
 
+                    networkViewModel.fetchFreeRepetitions(getWeekDay(0));
                     NavHostFragment.findNavController(LoginFragment.this)
                             .navigate(R.id.action_nav_login_to_nav_home);
                 }
