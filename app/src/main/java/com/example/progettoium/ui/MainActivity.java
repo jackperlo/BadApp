@@ -78,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        navigationView.getMenu().findItem(R.id.nav_booked).setVisible(false);
+        mainActivityBinding.btnLogOut.setVisibility(View.INVISIBLE);
+
         //mainActivityBinding.loading.setVisibility(View.VISIBLE);
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getApplicationContext().getResources().getString(R.string.connection));
