@@ -84,7 +84,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             lbl_CourseStartTime = itemView.findViewById(R.id.lbl_CourseStartTime);
             lbl_CourseEndTime = itemView.findViewById(R.id.lbl_CourseEndTime);
             lbl_CourseDisplayer = itemView.findViewById(R.id.lbl_CourseDisplayer);
-            lbl_TeacherDisplayer = itemView.findViewById(R.id.lbl_TeacherDisplayer);
+            lbl_TeacherDisplayer = itemView.findViewById(R.id.lblTeacherDisplayer);
             lbl_Day = itemView.findViewById(R.id.lbl_Day);
             btn_cancel = itemView.findViewById(R.id.btn_cancel);
 
@@ -109,7 +109,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
                 }
             });
 
-            btn_sustained = itemView.findViewById(R.id.btn_susteined);
+            btn_sustained = itemView.findViewById(R.id.btn_sustained);
             btn_sustained.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

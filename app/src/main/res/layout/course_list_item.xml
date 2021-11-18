@@ -25,14 +25,16 @@
                 android:layout_height="80dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/lbl_CourseEndTime"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:gravity="center_vertical"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textSize="20sp" />
 
         </LinearLayout>
 
