@@ -69,6 +69,7 @@
 
     <!-- RegistrationFragment.java -->
     <string name="registration_failed">Registration failed! Try Again!</string>
+    <string name="duplicate_email">Email already exists!</string>
 
     <!-- LoginFragment.java -->
     <string name="login_failed_fragment">Login Failed! Try Again</string>

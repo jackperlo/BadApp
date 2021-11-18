@@ -118,7 +118,6 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public void registerUser(String account, String password, String name, String surname) {
-        // TODO: possibile aggiungere un controllo che guarda se esiste gia un utente con quella mail?
         if (getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
@@ -314,7 +313,9 @@ public class NetworkViewModel extends AndroidViewModel {
                         isConnected.updateConnection(false);
 
                     if (service.equals("login") || service.equals("registration"))
-                        if(json.get().getString("error").equals("registration failed") || json.get().getString("error").equals("user not found")) {
+                        if(json.get().getString("error").contains("Duplicate entry")) {
+                            usersData.updateUser(new Pair<>(new User(), "duplicate email"));
+                        } else if(json.get().getString("error").equals("registration failed") || json.get().getString("error").equals("user not found")) {
                             usersData.updateUser(new Pair<>(new User(), service));
                         } else{
                             //Errore sul db --> il db non è connesso...

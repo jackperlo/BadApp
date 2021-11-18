@@ -40,10 +40,15 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            if(user.second.equals("registration")) {
-                if(progressDialog != null)
+            if(user.second.equals("duplicate email") || user.second.equals("registration")) {
+                if (progressDialog != null)
                     progressDialog.dismiss();
+            }
 
+            if(user.second.equals("duplicate email")) {
+                String out = getContext().getResources().getString(R.string.duplicate_email);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else if(user.second.equals("registration")) {
                 if (user.first == null) {
                     String out = getContext().getResources().getString(R.string.no_db_connection);
                     Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
