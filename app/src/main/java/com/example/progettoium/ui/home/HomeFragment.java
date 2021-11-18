@@ -46,10 +46,8 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new FreeRepetitionsCustomViewAdapter(getContext(), new ArrayList<>(), networkViewModel);
         recyclerView.setAdapter(adapter);
-
         TabLayout tabLayout = binding.tabLayout;
 
-        /*TRYING TO GET DATA FROM LIVEDATA*/
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
             if(user.first != null)
                 binding.lblWelcomeMainFragment.setText("Hi, " + user.first.getName() + " " + user.first.getSurname());
@@ -58,6 +56,7 @@ public class HomeFragment extends Fragment {
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getContext().getResources().getString(R.string.connection));
         progressDialog.show();
+
         networkViewModel.getFreeRepetitions().observe(getViewLifecycleOwner(), courseObjects -> {
             if(progressDialog != null)
                 progressDialog.dismiss();
@@ -92,6 +91,26 @@ public class HomeFragment extends Fragment {
         });
         networkViewModel.getbookRepetitionData().setValue(null);
 
+        networkViewModel.getManaged().observe(getViewLifecycleOwner(), manged -> {
+            if(progressDialog != null)
+                progressDialog.dismiss();
+
+            if(manged == null) {
+                String out = getContext().getResources().getString(R.string.no_db_connection);
+                Snackbar.make(getView(), out, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else if (manged){
+                networkViewModel.fetchFreeRepetitions(getWeekDay(0));
+            }
+        });
+
+        binding.swipeRefreshLayoutBooking.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+                networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
+            }
+        });
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -102,14 +121,6 @@ public class HomeFragment extends Fragment {
             public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
-        });
-
-        binding.swipeRefreshLayoutBooking.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                networkViewModel.fetchFreeRepetitions(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
-                networkViewModel.setOnDay(getWeekDay(binding.tabLayout.getSelectedTabPosition()));
-            }
         });
 
         return root;
