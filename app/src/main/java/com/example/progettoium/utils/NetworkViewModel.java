@@ -118,7 +118,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public void registerUser(String account, String password, String name, String surname) {
-        if (getIsConnected().getValue()) {
+        if (getIsConnected().getValue() != null && getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
@@ -131,7 +131,7 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public void loginUser(String account, String password) {
-        if (getIsConnected().getValue()) {
+        if (getIsConnected().getValue() != null && getIsConnected().getValue()) {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
@@ -174,23 +174,12 @@ public class NetworkViewModel extends AndroidViewModel {
     }
 
     public void bookARepetition(Courses selectedCourse, Teachers selectedTeacher, String startTime){
-        //launchThread(myURLs.getServerUrlBookARepetition(), items, "POST", "book");
-
         new BookARepetition().execute(myURLs.getServerUrlBookARepetition(), String.valueOf(3000), this.onDay, startTime, String.valueOf(selectedCourse.getIDCourse()), String.valueOf(selectedTeacher.getIDTeacher()), usersData.getValue().first.getAccount());
     }
 
-    public void changeRepetitionState(String newState, String day, String startTime, int idCourse, int idTeacher) {
-        /*HashMap<String, String> items = new HashMap<>();
-        items.put("newState", newState);
-        items.put("day", day);
-        items.put("startTime", startTime);
-        items.put("idCourse", String.valueOf(idCourse));
-        items.put("idTeacher", String.valueOf(idTeacher));
-        items.put("account", usersData.getValue().getAccount());*/
-        new ManageBookedRepetition().execute(newState, day, startTime, String.valueOf(idCourse), String.valueOf(idTeacher));
-        //launchThread(myURLs.getServerUrlManageRepetitions(), items, "GET", "change_state");
+    public void changeRepetitionState(String IDRepetition, String newState) {
+        new ManageBookedRepetition().execute(IDRepetition, newState);
     }
-
     /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
 
     /*utility methods*/
@@ -375,7 +364,7 @@ public class NetworkViewModel extends AndroidViewModel {
                         JSONArray jsonArray = json.get().getJSONArray("results");
                         for (int i = 0; i < jsonArray.length(); ++i) {
                             JSONObject jsonItem = jsonArray.getJSONObject(i);
-                            BookedRepetitions item = new BookedRepetitions(jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"), jsonItem.getInt("idCourse"), jsonItem.getInt("idTeacher"));
+                            BookedRepetitions item = new BookedRepetitions(jsonItem.getString("IDRepetition"), jsonItem.getString("day"), jsonItem.getString("startTime"), jsonItem.getString("title"), jsonItem.getString("surname"), jsonItem.getString("name"), jsonItem.getInt("idCourse"), jsonItem.getInt("idTeacher"));
                             bookedRepetitions.add(item);
                         }
                         bookedRepetitionsData.updateBookedRepetitions(bookedRepetitions);
@@ -423,13 +412,9 @@ public class NetworkViewModel extends AndroidViewModel {
         @Override
         protected String doInBackground(String... strings) {
             HashMap<String, String> items = new HashMap<>();
-            /*newState, day, startTime, String.valueOf(idCourse), String.valueOf(idTeacher)*/
-            items.put("newState", strings[0]);
-            items.put("day", strings[1]);
-            items.put("startTime", strings[2]);
-            items.put("idCourse", String.valueOf(strings[3]));
-            items.put("idTeacher", String.valueOf(strings[4]));
-            items.put("account", usersData.getValue().first.getAccount());
+            /*IDRepetition, newState, day, startTime, String.valueOf(idCourse), String.valueOf(idTeacher)*/
+            items.put("IDRepetition", strings[0]);
+            items.put("newState", strings[1]);
             items.put("sessionToken", sessionToken);
 
             return sendGETRequest(myURLs.getServerUrlManageRepetitions(), items);
