@@ -43,7 +43,5 @@ public class BookedRepetitions {
         return idCourse;
     }
 
-    public int getIdTeacher() {
-        return idTeacher;
-    }
+    public int getIdTeacher() { return idTeacher; }
 }

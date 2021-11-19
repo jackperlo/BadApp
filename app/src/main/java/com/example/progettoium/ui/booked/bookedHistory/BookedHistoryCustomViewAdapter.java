@@ -7,12 +7,14 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,7 +46,6 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         BookedRepetitions course = mData.get(position);
-
         if(course != null) {
             holder.lbl_CourseStartTime.setText("" + course.getStartTime());
             String[] temp = course.getStartTime().split(":");
@@ -56,11 +57,11 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             holder.lbl_CourseDisplayer.setText(String.valueOf(course.getSurname() + " " + course.getName()));
 
             if(networkViewModel.getOnState().equals("Active")) {
-                holder.btn_sustained.setVisibility(View.VISIBLE);
                 holder.btn_cancel.setVisibility(View.VISIBLE);
-            } else {
-                holder.btn_sustained.setVisibility(View.INVISIBLE);
-                holder.btn_cancel.setVisibility(View.INVISIBLE);
+                holder.btn_sustained.setVisibility(View.VISIBLE);
+            }else{
+                holder.btn_sustained.setVisibility(View.GONE);
+                holder.btn_cancel.setVisibility(View.GONE);
             }
         }
     }
@@ -84,9 +85,11 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             lbl_CourseStartTime = itemView.findViewById(R.id.lbl_CourseStartTime);
             lbl_CourseEndTime = itemView.findViewById(R.id.lbl_CourseEndTime);
             lbl_CourseDisplayer = itemView.findViewById(R.id.lbl_CourseDisplayer);
-            lbl_TeacherDisplayer = itemView.findViewById(R.id.lbl_TeacherDisplayer);
+            lbl_TeacherDisplayer = itemView.findViewById(R.id.lblTeacherDisplayer);
             lbl_Day = itemView.findViewById(R.id.lbl_Day);
+
             btn_cancel = itemView.findViewById(R.id.btn_cancel);
+            btn_sustained = itemView.findViewById(R.id.btn_sustained);
 
             btn_cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -109,7 +112,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
                 }
             });
 
-            btn_sustained = itemView.findViewById(R.id.btn_susteined);
+
             btn_sustained.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -134,8 +137,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            String item = parent.getItemAtPosition(position).toString();
-            //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_SHORT).show();
+            //Auto-generated method stub
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -162,7 +164,6 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
             this.oldPosts = oldPosts;
             this.newPosts = newPosts;
         }
-
 
         @Override
         public int getOldListSize() {

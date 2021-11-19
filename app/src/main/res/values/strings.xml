@@ -53,7 +53,7 @@
     <string name="cancel">Cancel</string>
     <string name="log_out">Log out</string>
     <string name="cancelled">Cancelled</string>
-    <string name="susteined">Susteined?</string>
+    <string name="susteined">Susteined</string>
 
     <!-- HomeFragment.java -->
     <string name="select_teacher">Select Teacher</string>
@@ -69,6 +69,7 @@
 
     <!-- RegistrationFragment.java -->
     <string name="registration_failed">Registration failed! Try Again!</string>
+    <string name="duplicate_email">Email already exists!</string>
 
     <!-- LoginFragment.java -->
     <string name="login_failed_fragment">Login Failed! Try Again</string>
