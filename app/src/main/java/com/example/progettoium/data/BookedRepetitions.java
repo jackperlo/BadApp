@@ -1,6 +1,7 @@
 package com.example.progettoium.data;
 
 public class BookedRepetitions {
+    String IDRepetition;
     String day;
     String startTime;
     String title;
@@ -9,7 +10,8 @@ public class BookedRepetitions {
     int idCourse;
     int idTeacher;
 
-    public BookedRepetitions(String day, String startTime, String title, String surname, String name, int idCourse, int idTeacher) {
+    public BookedRepetitions(String IDRepetition, String day, String startTime, String title, String surname, String name, int idCourse, int idTeacher) {
+        this.IDRepetition = IDRepetition;
         this.day = day;
         this.startTime = startTime;
         this.title = title;
@@ -17,6 +19,10 @@ public class BookedRepetitions {
         this.name = name;
         this.idCourse = idCourse;
         this.idTeacher = idTeacher;
+    }
+
+    public String getIDRepetition() {
+        return IDRepetition;
     }
 
     public String getDay() {

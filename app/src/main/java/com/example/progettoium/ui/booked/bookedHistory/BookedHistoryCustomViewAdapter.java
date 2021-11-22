@@ -104,7 +104,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
                                     progressDialog.setMessage("Connection...");
                                     progressDialog.show();
                                     BookedRepetitions choose = mData.get(getAdapterPosition());
-                                    networkViewModel.changeRepetitionState("Cancelled", choose.getDay(), choose.getStartTime(), choose.getIdCourse(), choose.getIdTeacher());
+                                    networkViewModel.changeRepetitionState(choose.getIDRepetition(), "Cancelled");
                                 }
                             })
                             .setNegativeButton("CANCEL", null)
@@ -126,7 +126,7 @@ public class BookedHistoryCustomViewAdapter extends RecyclerView.Adapter<BookedH
                                     progressDialog.setMessage("Connection...");
                                     progressDialog.show();
                                     BookedRepetitions choose = mData.get(getAdapterPosition());
-                                    networkViewModel.changeRepetitionState("Done", choose.getDay(), choose.getStartTime(), choose.getIdCourse(), choose.getIdTeacher());
+                                    networkViewModel.changeRepetitionState(choose.getIDRepetition(), "Done");
                                 }
                             })
                             .setNegativeButton("CANCEL", null)
