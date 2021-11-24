@@ -112,8 +112,7 @@ public class LoginFragment extends Fragment {
 
     private boolean validatePassword(EditText password) {
         String val = password.getText().toString();
-        String passwordVal =
-                "(.*[0-9])";  //at least 1 numeric
+        String passwordVal = "^(?=.*?[a-z].*?[a-z].*?[a-z])(?=.*?[\\d]).*$"; //at least 1 digit and 3 general character
 
         if (val.isEmpty()) {
             password.setError("Field cannot be empty");
