@@ -125,6 +125,7 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("name", name);
             items.put("surname", surname);
             items.put("sessionToken", "");
+            items.put("role", "Client");
 
             launchThread(myURLs.getServerUrlRegistration(), items, "POST", "registration");
         }
@@ -144,7 +145,7 @@ public class NetworkViewModel extends AndroidViewModel {
     public void logoutUser() {
         HashMap<String, String> items = new HashMap<>();
         items.put("sessionToken", "");
-        launchThread(myURLs.getServerUrlLogin(), items, "GET", "logout");
+        launchThread(myURLs.getServerUrlLogout(), items, "GET", "logout");
     }
 
     public void testServerConnection(String timeout, String type) {
