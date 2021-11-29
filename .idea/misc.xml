@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Nicole Gazzera/AndroidStudioProjects/BadApp/app/src/main/res/layout/activity_main.xml" value="0.1064102564102564" />
+        <entry key="..\:/Users/Nicole Gazzera/AndroidStudioProjects/BadApp/app/src/main/res/layout/course_list_item.xml" value="0.1064102564102564" />
+        <entry key="..\:/Users/Nicole Gazzera/AndroidStudioProjects/BadApp/app/src/main/res/layout/fragment_home.xml" value="0.1064102564102564" />
+        <entry key="..\:/Users/Nicole Gazzera/AndroidStudioProjects/BadApp/app/src/main/res/layout/fragment_login.xml" value="0.1064102564102564" />
+        <entry key="..\:/Users/Nicole Gazzera/AndroidStudioProjects/BadApp/app/src/main/res/layout/fragment_register.xml" value="0.1064102564102564" />
         <entry key="..\:/Users/fabri/Desktop/Fabry/3 Uni/1 Semestre/IUM 1/Progetto/BadApp/app/src/main/res/drawable/ic_menu_gallery.xml" value="0.2703125" />
         <entry key="..\:/Users/fabri/Desktop/Fabry/3 Uni/1 Semestre/IUM 1/Progetto/BadApp/app/src/main/res/drawable/ic_menu_slideshow.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/fabri/Desktop/Fabry/3 Uni/1 Semestre/IUM 1/Progetto/BadApp/app/src/main/res/drawable/side_nav_bar.xml" value="0.14635416666666667" />

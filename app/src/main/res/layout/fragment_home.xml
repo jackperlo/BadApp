@@ -15,7 +15,8 @@
         android:layout_marginTop="10dp"
         android:text="@string/welcome_user"
         android:textColor="@color/TEXT"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        android:visibility="invisible" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"

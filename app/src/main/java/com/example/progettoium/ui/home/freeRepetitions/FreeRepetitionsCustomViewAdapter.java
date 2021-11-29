@@ -77,9 +77,12 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
         String jolly2 = mInflater.getContext().getResources().getString(R.string.select_teacher);
 
         jollyTeacher = new Teachers(-1, jolly2, "");
-        holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
+        //holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
+        holder.spinner_TeachersDisplayer.setEnabled(false);
 
-        holder.btn_bookLesson.setVisibility(View.GONE);
+        //holder.btn_bookLesson.setVisibility(View.GONE);
+        holder.btn_bookLesson.setEnabled(false);
+
     }
 
     // total number of rows
@@ -130,13 +133,22 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
                     spinner_TeachersDisplayer.setAdapter(teacherSpinnerAdapter);
                     spinner_TeachersDisplayer.setSelection(teacherSpinnerAdapter.getPosition(jollyTeacher));
 
-                    if(spinner_TeachersDisplayer.getVisibility() == View.GONE)
-                        spinner_TeachersDisplayer.setVisibility(View.VISIBLE);
+                    if(!spinner_TeachersDisplayer.isEnabled())
+                        spinner_TeachersDisplayer.setEnabled(true);
+                    //if(spinner_TeachersDisplayer.getVisibility() == View.GONE)
+                        //spinner_TeachersDisplayer.setVisibility(View.VISIBLE);
+
+
                 }else{
-                    if(spinner_TeachersDisplayer.getVisibility() == View.VISIBLE)
-                        spinner_TeachersDisplayer.setVisibility(View.GONE);
-                    if(btn_bookLesson.getVisibility() == View.VISIBLE)
-                        btn_bookLesson.setVisibility(View.GONE);
+                        if(spinner_TeachersDisplayer.isEnabled())
+                            spinner_TeachersDisplayer.setEnabled(false);
+                    //if(spinner_TeachersDisplayer.getVisibility() == View.VISIBLE)
+                        //spinner_TeachersDisplayer.setVisibility(View.GONE);
+
+                    if(btn_bookLesson.isEnabled())
+                        btn_bookLesson.setEnabled(false);
+                    //if(btn_bookLesson.getVisibility() == View.VISIBLE)
+                    //btn_bookLesson.setVisibility(View.GONE);
                 }
 
                 //Toast.makeText(mInflater.getContext(), "Course ID: "+course.getIDCourse()+", Title : "+course.getTitle(), Toast.LENGTH_SHORT).show();
@@ -156,10 +168,13 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
                 if(selectedTeacher.getIDTeacher() != -1){
                     User loggedUser =  networkViewModel.getRegisteredUser().getValue().first;
                     if(loggedUser != null && loggedUser.getAccount() != null && loggedUser.getSurname() != null && loggedUser.getName() != null)
-                        btn_bookLesson.setVisibility(View.VISIBLE);
+                        btn_bookLesson.setEnabled(true);
+                        //btn_bookLesson.setVisibility(View.VISIBLE);
                 }else{
-                    if(btn_bookLesson.getVisibility() == View.VISIBLE)
-                        btn_bookLesson.setVisibility(View.GONE);
+                    //if(btn_bookLesson.getVisibility() == View.VISIBLE)
+                        //btn_bookLesson.setVisibility(View.GONE);
+                    if(btn_bookLesson.isEnabled())
+                        btn_bookLesson.setEnabled(false);
                 }
             }
 

@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_nameAndsurname">Guest</string>
-    <string name="nav_header_email"></string>
+    <!--<string name="nav_header_email"></string>-->
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
@@ -15,7 +15,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
+    <string name="welcome">welcome</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
@@ -40,7 +40,7 @@
     <string name="surname">Surname</string>
     <string name="password">Password</string>
     <string name="email">mario.rossi@email.com</string>
-    <string name="re_type_password">Re-type Password</string>
+    <string name="re_type_password">Confirm password</string>
     <string name="sign_up">Sign Up</string>
     <string name="register">Register</string>
     <string name="sign_up_to_continue">Sign Up to continue</string>
@@ -60,7 +60,7 @@
     <string name="select_course">Select Course</string>
 
     <!-- Main Activity.java -->
-    <string name="connection">Connection...</string>
+    <string name="connection">Connection&#8230;</string>
     <string name="session_expired">SESSION EXPIRED</string>
     <string name="logout_success">LOGOUT DONE SUCCESSFULLY</string>
 
