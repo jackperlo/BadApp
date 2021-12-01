@@ -16,7 +16,7 @@
         android:text="@string/welcome_user"
         android:textColor="@color/TEXT"
         android:textSize="30sp"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -30,6 +30,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayoutBooking"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/courses_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayout"
@@ -64,20 +78,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/friday" />
             </com.google.android.material.tabs.TabLayout>
-
-
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:id="@+id/swipeRefreshLayoutBooking"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/courses_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                </androidx.recyclerview.widget.RecyclerView>
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         </LinearLayout>
 
