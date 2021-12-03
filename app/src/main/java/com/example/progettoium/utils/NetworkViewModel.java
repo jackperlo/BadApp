@@ -113,8 +113,7 @@ public class NetworkViewModel extends AndroidViewModel {
     /*GETTING DATA FROM DB VIA JAVA SERVLETS*/
     public void checkSession() {
         HashMap<String, String> items = new HashMap<String, String>();
-        items.put("sessionToken", sessionToken);
-        launchThread(myURLs.getServerUrlCheckSession(), items, "POST", "check session");
+        launchThread(myURLs.getServerUrlCheckSession(), items, "POST", "check session", sessionToken);
     }
 
     public void registerUser(String account, String password, String name, String surname) {
@@ -124,10 +123,9 @@ public class NetworkViewModel extends AndroidViewModel {
             items.put("password", password);
             items.put("name", name);
             items.put("surname", surname);
-            items.put("sessionToken", "");
             items.put("role", "Client");
 
-            launchThread(myURLs.getServerUrlRegistration(), items, "POST", "registration");
+            launchThread(myURLs.getServerUrlRegistration(), items, "POST", "registration", "");
         }
     }
 
@@ -136,16 +134,13 @@ public class NetworkViewModel extends AndroidViewModel {
             HashMap<String, String> items = new HashMap<String, String>();
             items.put("account", account);
             items.put("password", password);
-            items.put("sessionToken", "");
 
-            launchThread(myURLs.getServerUrlLogin(), items, "POST", "login");
+            launchThread(myURLs.getServerUrlLogin(), items, "POST", "login", "");
         }
     }
 
     public void logoutUser() {
-        HashMap<String, String> items = new HashMap<>();
-        items.put("sessionToken", "");
-        launchThread(myURLs.getServerUrlLogout(), items, "GET", "logout");
+        launchThread(myURLs.getServerUrlLogout(), new HashMap<>(), "GET", "logout", "");
     }
 
     public void testServerConnection(String timeout, String type) {
@@ -158,19 +153,18 @@ public class NetworkViewModel extends AndroidViewModel {
 
             items.put("state", this.onState);
             items.put("account", usersData.getValue().first.getAccount());
-            items.put("sessionToken", sessionToken);
-            launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked");
+            launchThread(myURLs.getServerUrlBookedHistoryRepetitions(), items, "POST", "booked", sessionToken);
         }
     }
 
     public void fetchFreeRepetitions(String day) {
         HashMap<String, String> items = new HashMap<>();
         items.put("day", day);
-        items.put("sessionToken", "");
 
         if(usersData.getValue()!=null && usersData.getValue().first.getAccount()!=null && usersData.getValue().first.getSurname()!=null && usersData.getValue().first.getName()!=null)
             items.put("account", usersData.getValue().first.getAccount());
-        launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free");
+
+        launchThread(myURLs.getServerUrlFreeRepetitions(), items, "POST", "free", "");
 
     }
 
@@ -184,7 +178,7 @@ public class NetworkViewModel extends AndroidViewModel {
     /*END GETTING DATA FROM DB VIA JAVA SERVLETS*/
 
     /*utility methods*/
-    private String sendPOSTRequest(String urlServer, HashMap<String, String> params) {
+    private String sendPOSTRequest(String urlServer, HashMap<String, String> params, String token) {
         HttpURLConnection conn = null;
 
         String parameters = "";
@@ -210,7 +204,9 @@ public class NetworkViewModel extends AndroidViewModel {
             conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
             conn.setUseCaches(false);
             conn.setDoOutput(true);
-            conn.setRequestProperty("Cookie", "JSESSIONID=" + params.get("sessionToken"));
+
+            if(!token.equals(""))
+                conn.setRequestProperty("Cookie", "JSESSIONID=" + token);
 
             try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
                 wr.write(postData);
@@ -232,7 +228,7 @@ public class NetworkViewModel extends AndroidViewModel {
 
     }
 
-    private String sendGETRequest(String urlServer, HashMap<String, String> params) {
+    private String sendGETRequest(String urlServer, HashMap<String, String> params, String token) {
         HttpURLConnection conn = null;
 
         urlServer += "?";
@@ -254,7 +250,9 @@ public class NetworkViewModel extends AndroidViewModel {
             conn.setConnectTimeout(20000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
-            conn.setRequestProperty("Cookie", "JSESSIONID=" + params.get("sessionToken"));
+
+            if(!token.equals(""))
+                conn.setRequestProperty("Cookie", "JSESSIONID=" + token);
 
             conn.connect();
             int response = conn.getResponseCode();
@@ -282,15 +280,15 @@ public class NetworkViewModel extends AndroidViewModel {
         return result.toString();
     }
 
-    public void launchThread(String url, HashMap<String, String> params, String connType, String service) {
+    public void launchThread(String url, HashMap<String, String> params, String connType, String service, String token) {
         AtomicReference<JSONObject> json = new AtomicReference<>();
         Executor e = Executors.newSingleThreadExecutor();
         e.execute(() -> {
             String val;
             if (connType.equals("GET"))
-                val = sendGETRequest(url, params);
+                val = sendGETRequest(url, params, token);
             else if (connType.equals("POST"))
-                val = sendPOSTRequest(url, params);
+                val = sendPOSTRequest(url, params, token);
             else
                 val = null;
 
@@ -390,8 +388,7 @@ public class NetworkViewModel extends AndroidViewModel {
         protected String doInBackground(String... strings) {
             HashMap<String, String> param = new HashMap<>();
             param.put("type", strings[2]);
-            param.put("sessionToken", "");
-            return sendGETRequest(strings[0], param);
+            return sendGETRequest(strings[0], param, "");
         }
 
         @Override
@@ -416,9 +413,8 @@ public class NetworkViewModel extends AndroidViewModel {
             /*IDRepetition, newState, day, startTime, String.valueOf(idCourse), String.valueOf(idTeacher)*/
             items.put("IDRepetition", strings[0]);
             items.put("newState", strings[1]);
-            items.put("sessionToken", sessionToken);
 
-            return sendGETRequest(myURLs.getServerUrlManageRepetitions(), items);
+            return sendGETRequest(myURLs.getServerUrlManageRepetitions(), items, sessionToken);
         }
 
         @Override
@@ -446,21 +442,14 @@ public class NetworkViewModel extends AndroidViewModel {
     public class BookARepetition extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
-            try {
-                Thread.sleep(Integer.parseInt(strings[1]));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
             HashMap<String, String> items = new HashMap<>();
             items.put("day", strings[2]);
             items.put("startTime", strings[3]);
             items.put("IDCourse", strings[4]);
             items.put("IDTeacher", strings[5]);
             items.put("account", strings[6]);
-            items.put("sessionToken", sessionToken);
 
-            return sendPOSTRequest(strings[0], items);
+            return sendPOSTRequest(strings[0], items, sessionToken);
         }
 
         @Override
