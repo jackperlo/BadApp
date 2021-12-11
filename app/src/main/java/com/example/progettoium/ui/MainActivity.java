@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mainActivityBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mainActivityBinding.getRoot());
 
-        AtomicReference<Boolean> checkSession = new AtomicReference<>();
+        AtomicReference<Boolean> checkSession = new AtomicReference<>(); //serve per controllare la sessione una volta sola
         checkSession.set(true);
 
         CookieHandler.setDefault(new CookieManager());
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         model = new ViewModelProvider(this).get(NetworkViewModel.class);
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("SESSION", 0);
-        model.setSessionToken(sharedPreferences.getString("session_token", null));
+        model.setSessionToken(sharedPreferences.getString("session_token", ""));
 
         setSupportActionBar(mainActivityBinding.appBarMain.toolbar);
         DrawerLayout drawer = mainActivityBinding.drawerLayout;

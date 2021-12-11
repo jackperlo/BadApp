@@ -79,6 +79,7 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
         jollyTeacher = new Teachers(-1, jolly2, "");
         //holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
         holder.spinner_TeachersDisplayer.setEnabled(false);
+        holder.spinner_TeachersDisplayer.setAdapter(null);
 
         //holder.btn_bookLesson.setVisibility(View.GONE);
         holder.btn_bookLesson.setEnabled(false);
