@@ -62,7 +62,7 @@ public class BookedFragment extends Fragment {
         });
 
         networkViewModel.getRegisteredUser().observe(getViewLifecycleOwner(), user -> {
-            if(user.second.equals("session expired")) {
+            if(user.second.equals("session expired") || user.second.equals("logout")) {
                 NavHostFragment.findNavController(BookedFragment.this)
                         .navigate(R.id.action_nav_booked_to_nav_home);
             }
