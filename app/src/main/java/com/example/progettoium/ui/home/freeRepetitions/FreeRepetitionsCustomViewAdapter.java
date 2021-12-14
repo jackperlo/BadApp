@@ -35,6 +35,7 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
     private List<FreeRepetitions> mData;
     private LayoutInflater mInflater;
     private Teachers jollyTeacher;
+    private Courses jollyCourse;
     private Courses selectedCourse;
     private Teachers selectedTeacher;
     private NetworkViewModel networkViewModel;
@@ -45,6 +46,12 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.networkViewModel = networkViewModel;
+
+        String jolly1 = mInflater.getContext().getResources().getString(R.string.select_course);
+        jollyCourse = new Courses(-1, String.valueOf(jolly1));
+
+        String jolly2 = mInflater.getContext().getResources().getString(R.string.select_teacher);
+        jollyTeacher = new Teachers(-1, jolly2, "");
     }
 
     // inflates the row layout from xml when needed
@@ -66,17 +73,22 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
         holder.lbl_CourseEndTime.setText(""+endTime+":00");
 
         ArrayList<Courses> courseList = repetition.getCoursesList();
-        String jolly1 = mInflater.getContext().getResources().getString(R.string.select_course);
-        Courses jollyCourse = new Courses(-1, String.valueOf(jolly1));
-        courseList.add(0, jollyCourse);
+
+        boolean present = false;
+        for(Courses c: courseList) {
+            if(c.getIDCourse() == jollyCourse.getIDCourse()) {
+                present = true;
+                break;
+            }
+        }
+        if(!present)
+            courseList.add(0, jollyCourse);
+
         ArrayAdapter<Courses> courseSpinnerAdapter = new ArrayAdapter<Courses>(mInflater.getContext(), android.R.layout.simple_spinner_item, courseList);
         courseSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         holder.spinner_CoursesDisplayer.setAdapter(courseSpinnerAdapter);
         holder.spinner_CoursesDisplayer.setSelection(courseSpinnerAdapter.getPosition(jollyCourse));
 
-        String jolly2 = mInflater.getContext().getResources().getString(R.string.select_teacher);
-
-        jollyTeacher = new Teachers(-1, jolly2, "");
         //holder.spinner_TeachersDisplayer.setVisibility(View.GONE);
         holder.spinner_TeachersDisplayer.setEnabled(false);
         holder.spinner_TeachersDisplayer.setAdapter(null);
@@ -127,8 +139,17 @@ public class FreeRepetitionsCustomViewAdapter extends RecyclerView.Adapter<FreeR
 
                 if(selectedCourse.getIDCourse() != -1){
                     ArrayList<Teachers> teachersList =  selectedCourse.getTeachersList();
-                    if(!teachersList.contains(jollyTeacher))
+
+                    boolean present = false;
+                    for(Teachers c: teachersList) {
+                        if(c.getIDTeacher() == jollyTeacher.getIDTeacher()) {
+                            present = true;
+                            break;
+                        }
+                    }
+                    if(!present)
                         teachersList.add(0, jollyTeacher);
+
                     ArrayAdapter<Teachers> teacherSpinnerAdapter = new ArrayAdapter<Teachers>(mInflater.getContext(), android.R.layout.simple_spinner_item, teachersList);
                     teacherSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner_TeachersDisplayer.setAdapter(teacherSpinnerAdapter);
